@@ -221,6 +221,44 @@ class WalletService {
         _polygonClient = Web3Client(polygonUrl, http.Client()),
         _secureStorage = const FlutterSecureStorage();
 
+  void fetchBalance() {
+    const String wsUrl =
+        'wss://sepolia.infura.io/ws/v3/67048bd8b88444cbb4d0aee7adcbffd1';
+
+    // Create a WebSocket channel
+    final channel = WebSocketChannel.connect(Uri.parse(wsUrl));
+
+    // Define the JSON-RPC request
+    final Map<String, dynamic> request = {
+      "jsonrpc": "2.0",
+      "method": "eth_getBalance",
+      "params": ["0x49534011FB6caC5aaDA5E5C993E256fB2AeA391D", "latest"],
+      "id": 1
+    };
+
+    channel.sink.add(jsonEncode(request));
+
+    channel.stream.listen((response) {
+      print('Response from WebSocket: $response');
+
+      // Parse the response
+      final data = jsonDecode(response);
+
+      if (data['id'] == 1 && data['result'] != null) {
+        final balanceInWei =
+            BigInt.parse(data['result'].substring(2), radix: 16);
+        print('Balance in Wei: $balanceInWei');
+
+        final balanceInEther = balanceInWei / BigInt.from(10).pow(18);
+        print('Balance in Ether: $balanceInEther');
+      }
+    }, onError: (error) {
+      print('WebSocket error: $error');
+    }, onDone: () {
+      print('WebSocket connection closed');
+    });
+  }
+
   Future<String> getMnemonic() async {
     const mnemonicKey = "mnemonic";
     final existingMnemonic = await _secureStorage.read(key: mnemonicKey);
@@ -368,7 +406,6 @@ class WalletService {
 
     // await deleteAllAccounts();
 
-
     return {
       'mnemonic': mnemonic,
       'address': newAddress,
@@ -403,7 +440,7 @@ class WalletService {
 
     // Check if the wallet already exists
     final existingAccount = accounts.firstWhere(
-          (account) {
+      (account) {
         print('Checking if account address exists:');
         print('Account address: ${account['address']}');
         print('Address being checked: $address');
@@ -417,7 +454,6 @@ class WalletService {
       print('Duplicate account address: $address');
       throw Exception('Wallet with this address already exists.');
     }
-
 
     final newAliasName = 'Account_${accounts.length + 1}';
 
@@ -533,7 +569,8 @@ class WalletService {
       // Delete all accounts data from secure storage
       await _secureStorage.delete(key: _walletKey);
       await _secureStorage.delete(key: 'mnemonicKey');
-      await _secureStorage.delete(key: 'mnemonic'); // Add this line to delete mnemonic
+      await _secureStorage.delete(
+          key: 'mnemonic'); // Add this line to delete mnemonic
       print("All accounts deleted successfully.");
     } catch (e) {
       print("Failed to delete accounts: $e");

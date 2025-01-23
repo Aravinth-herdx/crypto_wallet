@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 
 import '../models/network.dart';
 
-
 class NetworkSelector extends StatefulWidget {
   const NetworkSelector({Key? key}) : super(key: key);
 
@@ -37,15 +36,15 @@ class _NetworkSelectorState extends State<NetworkSelector> {
       iconBgColor: const Color(0xFF00FFA3).withOpacity(0.2),
     ),
     Network(
-      name: 'Goerli Test Network',
+      name: 'Sepolia Test Network',
       icon: '🔧',
-      chainId: '5',
+      chainId: '11155111',
       isTestnet: true,
       iconBgColor: const Color(0xFF4F6DE6).withOpacity(0.2),
     ),
   ];
 
-  int selectedNetworkIndex = 0;
+  int selectedNetworkIndex = 4;
 
   void _showNetworkPicker() {
     showCupertinoModalPopup(
@@ -105,8 +104,7 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                       ),
                     ),
                     ...networks.where((n) => !n.isTestnet).map((network) =>
-                        _buildNetworkItem(networks.indexOf(network), network)
-                    ),
+                        _buildNetworkItem(networks.indexOf(network), network)),
                     const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text(
@@ -119,37 +117,36 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                       ),
                     ),
                     ...networks.where((n) => n.isTestnet).map((network) =>
-                        _buildNetworkItem(networks.indexOf(network), network)
-                    ),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: CupertinoButton(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        color: CupertinoColors.systemGrey6,
-                        borderRadius: BorderRadius.circular(8),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              CupertinoIcons.plus_circle_fill,
-                              color: CupertinoColors.activeBlue,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Add Custom Network',
-                              style: TextStyle(
-                                color: CupertinoColors.activeBlue,
-                              ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          // Handle add custom network
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
+                        _buildNetworkItem(networks.indexOf(network), network)),
+                    // const SizedBox(height: 16),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                    //   child: CupertinoButton(
+                    //     padding: const EdgeInsets.symmetric(vertical: 12),
+                    //     color: CupertinoColors.systemGrey6,
+                    //     borderRadius: BorderRadius.circular(8),
+                    //     child: const Row(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Icon(
+                    //           CupertinoIcons.plus_circle_fill,
+                    //           color: CupertinoColors.activeBlue,
+                    //         ),
+                    //         SizedBox(width: 8),
+                    //         Text(
+                    //           'Add Custom Network',
+                    //           style: TextStyle(
+                    //             color: CupertinoColors.activeBlue,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     onPressed: () {
+                    //       // Handle add custom network
+                    //       Navigator.pop(context);
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -162,15 +159,20 @@ class _NetworkSelectorState extends State<NetworkSelector> {
 
   Widget _buildNetworkItem(int index, Network network) {
     final bool isSelected = index == selectedNetworkIndex;
+    final bool isImplemented = network.isTestnet
+        ? true
+        : false; // Assuming non-testnet networks are implemented.
 
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: () {
-        setState(() {
-          selectedNetworkIndex = index;
-        });
-        Navigator.pop(context);
-      },
+      onPressed: isImplemented
+          ? () {
+              setState(() {
+                selectedNetworkIndex = index;
+              });
+              Navigator.pop(context);
+            }
+          : null, // Disable selection if not implemented
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
@@ -211,13 +213,22 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Chain ID: ${network.chainId}',
-                    style: const TextStyle(
-                      color: CupertinoColors.systemGrey,
-                      fontSize: 13,
+                  if (!isImplemented)
+                    Text(
+                      'Not Implemented',
+                      style: const TextStyle(
+                        color: CupertinoColors.systemRed,
+                        fontSize: 13,
+                      ),
+                    )
+                  else
+                    Text(
+                      'Chain ID: ${network.chainId}',
+                      style: const TextStyle(
+                        color: CupertinoColors.systemGrey,
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

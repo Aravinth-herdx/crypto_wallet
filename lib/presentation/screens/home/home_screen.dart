@@ -1,13 +1,15 @@
+import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
 import 'package:crypto_wallet/presentation/screens/home/widgets/account_selector.dart';
 import 'package:crypto_wallet/presentation/screens/home/widgets/network_selector.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/accouns_provider.dart';
 import '../../widgets/balance_card.dart';
 import '../../widgets/token_list.dart';
 
-class HomeScreenNew extends ConsumerWidget  {
+class HomeScreenNew extends ConsumerWidget {
   const HomeScreenNew({super.key});
 
   @override
@@ -83,13 +85,23 @@ class HomeScreenNew extends ConsumerWidget  {
             const NetworkSelector(),
             const SizedBox(height: 20),
             BalanceCard(
-              currency: 'USD',
-              totalBalance: totalBalance.toStringAsFixed(2),
+              currency: 'ETH',
+              totalBalance: ref.watch(walletBalanceProvider).balance.toString(),
             ),
             const SizedBox(height: 20),
-            TokenList(
-              tokens: tokens,
-            ),
+            if (ref.watch(walletBalanceProvider).isLoading) ...[
+              const SizedBox(
+                height: 80,
+                width: 20,
+              ),
+              Center(
+                child: CupertinoActivityIndicator(),
+              ),
+            ] else ...[
+              TokenList(
+                tokens: ref.watch(walletBalanceProvider).currency,
+              ),
+            ]
           ],
         ),
       ),

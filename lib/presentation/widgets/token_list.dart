@@ -1,7 +1,12 @@
+import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
+import 'package:crypto_wallet/presentation/screens/home/models/currency_model.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class TokenList extends StatelessWidget {
-  final List<Map<String, String>> tokens;
+class TokenList extends ConsumerWidget {
+  final List<CurrencyModel> tokens;
 
   const TokenList({
     Key? key,
@@ -9,7 +14,7 @@ class TokenList extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: CupertinoTheme.of(context).scaffoldBackgroundColor,
@@ -18,15 +23,18 @@ class TokenList extends StatelessWidget {
           color: CupertinoColors.systemGrey5,
         ),
       ),
-      child: Column(
-        children: tokens.map((token) => TokenListItem(token: token)).toList(),
+      child: Skeletonizer(
+        enabled: ref.watch(walletBalanceProvider).isLoading,
+        child: Column(
+          children: tokens.map((token) => TokenListItem(token: token)).toList(),
+        ),
       ),
     );
   }
 }
 
 class TokenListItem extends StatelessWidget {
-  final Map<String, String> token;
+  final CurrencyModel token;
 
   const TokenListItem({
     Key? key,
@@ -47,23 +55,8 @@ class TokenListItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Token Icon
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: CupertinoColors.systemGrey5,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Center(
-              child: Text(
-                token['symbol']?.substring(0, 1) ?? '',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
+          CircleAvatar(
+            child: Image.network(token.coinIcon),
           ),
           const SizedBox(width: 12),
           // Token Details
@@ -72,20 +65,20 @@ class TokenListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  token['symbol'] ?? '',
+                  token.currency.toUpperCase(),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${token['balance']} ${token['symbol']}',
-                  style: const TextStyle(
-                    color: CupertinoColors.systemGrey,
-                    fontSize: 14,
-                  ),
-                ),
+                // const SizedBox(height: 4),
+                // Text(
+                //   token.volume.toString(),
+                //   style: const TextStyle(
+                //     color: CupertinoColors.systemGrey,
+                //     fontSize: 14,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -94,7 +87,8 @@ class TokenListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${token['value']}',
+                formatMarketCap(token.marketCap),
+                // '\$${token.marketCap}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -102,9 +96,11 @@ class TokenListItem extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                _calculateChange(),
+                // _calculateChange(),
+                '${token.priceChangePercentage.toString()}%',
                 style: TextStyle(
-                  color: _getChangeColor(context),
+                  color:
+                      _getChangeColor(token.priceChangePercentage.toString()),
                   fontSize: 14,
                 ),
               ),
@@ -115,15 +111,22 @@ class TokenListItem extends StatelessWidget {
     );
   }
 
-  String _calculateChange() {
-    // In a real app, this would calculate the 24h change
-    // For now, returning a dummy value
-    return '+2.5%';
+  String formatMarketCap(double value) {
+    if (value >= 1e9) {
+      return '\$${(value / 1e9).toStringAsFixed(2)} B'; // Billion
+    } else if (value >= 1e6) {
+      return '\$${(value / 1e6).toStringAsFixed(2)} M'; // Million
+    } else {
+      return '\$${value.toStringAsFixed(2)}'; // Standard formatting
+    }
   }
 
-  Color _getChangeColor(BuildContext context) {
+  Color _getChangeColor(String context) {
     // This would normally check if the change is positive or negative
     // For now, returning green for demo
-    return CupertinoColors.activeGreen;
+    if (context.contains('+')) {
+      return CupertinoColors.activeGreen;
+    }
+    return CupertinoColors.destructiveRed;
   }
 }

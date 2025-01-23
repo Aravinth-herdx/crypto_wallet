@@ -1,9 +1,13 @@
+import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
+import 'package:crypto_wallet/presentation/screens/home/models/transaction.dart';
+import 'package:crypto_wallet/providers/accouns_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/transaction_history.dart';
 
-class TransactionListItem extends StatelessWidget {
-  final TransactionHistory transaction;
+class TransactionListItem extends ConsumerStatefulWidget {
+  final Transaction transaction;
   final VoidCallback onTap;
 
   const TransactionListItem({
@@ -13,9 +17,17 @@ class TransactionListItem extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  ConsumerState<TransactionListItem> createState() =>
+      _TransactionListItemState();
+}
+
+class _TransactionListItemState extends ConsumerState<TransactionListItem> {
+  @override
   Widget build(BuildContext context) {
+    final walletProvider = ref.watch(walletBalanceProvider);
+    final account = ref.watch(accountProvider);
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -28,10 +40,10 @@ class TransactionListItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              transaction.type == TransactionType.receive
+              widget.transaction.to == account.selectedAccount?.address
                   ? CupertinoIcons.arrow_down_left
                   : CupertinoIcons.arrow_up_right,
-              color: transaction.type == TransactionType.receive
+              color: widget.transaction.to == account.selectedAccount?.address
                   ? CupertinoColors.activeGreen
                   : CupertinoColors.destructiveRed,
             ),
@@ -41,15 +53,15 @@ class TransactionListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    transaction.type == TransactionType.receive
-                        ? 'Received ${transaction.token}'
-                        : 'Sent ${transaction.token}',
+                    widget.transaction.to == account.selectedAccount?.address
+                        ? 'Received ${widget.transaction.network}'
+                        : 'Sent ${widget.transaction.network}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '${transaction.timestamp.toString().split('.')[0]}',
+                    '${widget.transaction.date.toString()}',
                     style: const TextStyle(
                       fontSize: 12,
                       color: CupertinoColors.systemGrey,
@@ -62,13 +74,13 @@ class TransactionListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${transaction.amount} ${transaction.token}',
+                  '${widget.transaction.amount} ${widget.transaction.network}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  'Fee: ${transaction.fee} ${transaction.token}',
+                  'Fee: ${widget.transaction.fee.toStringAsFixed(7)} ${widget.transaction.network}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: CupertinoColors.systemGrey,

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../core/services/websocket/wallet_balance_state.dart';
+import '../../providers/accouns_provider.dart';
+
 class NewWalletScreen extends ConsumerStatefulWidget {
   const NewWalletScreen({super.key});
 
@@ -55,6 +58,10 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
     );
 
     if (mounted && context.mounted) {
+      ref.read(walletBalanceProvider.notifier).fetchTransactions(
+          ref.watch(accountProvider).selectedAccount?.address ?? '');
+      ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+          ref.watch(accountProvider).selectedAccount?.address ?? '');
       Navigator.pop(context);
     }
   }
