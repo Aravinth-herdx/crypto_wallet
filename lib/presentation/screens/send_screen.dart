@@ -17,18 +17,18 @@ class SendScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return CupertinoPageScaffold(
+    return const CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: const Text('Send'),
-        trailing: IconButton(
-          icon: const Icon(Icons.qr_code_scanner),
-          onPressed: () => _scanQRCode(context),
-        ),
+        middle: Text('Send'),
+        // trailing: IconButton(
+        //   icon: const Icon(Icons.qr_code_scanner),
+        //   onPressed: () => _scanQRCode(context),
+        // ),
       ),
-      child: const SafeArea(
+      child: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: SendForm(),
+          child: EnhancedSendForm(),
         ),
       ),
     );
@@ -45,23 +45,23 @@ class SendScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _shareQRCode(BuildContext context, String address) async {
-    final qrPainter = QrPainter(
-      data: address,
-      version: QrVersions.auto,
-      color: Colors.black,
-      emptyColor: Colors.white,
-    );
-
-    final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/qr_code.png';
-    final file = File(path);
-
-    final qrImage = await qrPainter.toImage(200);
-    final byteData = await qrImage.toByteData(format: ImageByteFormat.png);
-    await file.writeAsBytes(byteData!.buffer.asUint8List());
-
-    final xFile = XFile(path);
-    await Share.shareXFiles([xFile], text: AppLocalizations.of(context).shareAddressMessage);
-  }
+  // Future<void> _shareQRCode(BuildContext context, String address) async {
+  //   final qrPainter = QrPainter(
+  //     data: address,
+  //     version: QrVersions.auto,
+  //     color: Colors.black,
+  //     emptyColor: Colors.white,
+  //   );
+  //
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   final path = '${directory.path}/qr_code.png';
+  //   final file = File(path);
+  //
+  //   final qrImage = await qrPainter.toImage(200);
+  //   final byteData = await qrImage.toByteData(format: ImageByteFormat.png);
+  //   await file.writeAsBytes(byteData!.buffer.asUint8List());
+  //
+  //   final xFile = XFile(path);
+  //   await Share.shareXFiles([xFile], text: AppLocalizations.of(context).shareAddressMessage);
+  // }
 }

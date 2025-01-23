@@ -1,188 +1,3 @@
-// import 'dart:math';
-// import 'package:bip39/bip39.dart' as bip39;
-// import 'package:crypto_wallet/core/services/wallet/secure_storage_service.dart';
-//
-// import '../../models/wallet_credentials.dart';
-//
-// class WalletService {
-//   final SecureStorageService _secureStorage;
-//
-//   WalletService(this._secureStorage);
-//
-//   Future<WalletCredentials> createWallet() async {
-//     // In real implementation, use proper wallet creation logic
-//     final mnemonic = bip39.generateMnemonic();
-//     // Generate proper key pairs based on mnemonic
-//     final credentials = WalletCredentials(
-//       mnemonic: mnemonic,
-//       privateKey: 'generated_private_key',
-//       publicKey: 'generated_public_key',
-//       walletAddress: 'generated_wallet_address',
-//     );
-//
-//     await _secureStorage.saveWalletCredentials(credentials);
-//     return credentials;
-//   }
-//
-//   Future<WalletCredentials> importWallet(String mnemonic) async {
-//     // Validate mnemonic and generate wallet
-//     if (!bip39.validateMnemonic(mnemonic)) {
-//       throw Exception('Invalid mnemonic phrase');
-//     }
-//
-//     // Generate proper key pairs based on mnemonic
-//     final credentials = WalletCredentials(
-//       mnemonic: mnemonic,
-//       privateKey: 'imported_private_key',
-//       publicKey: 'imported_public_key',
-//       walletAddress: 'imported_wallet_address',
-//     );
-//
-//     await _secureStorage.saveWalletCredentials(credentials);
-//     return credentials;
-//   }
-// }
-
-// import 'dart:convert';
-//
-// import 'package:web3dart/web3dart.dart';
-// import 'package:bip39/bip39.dart' as bip39;
-// import 'package:ed25519_hd_key/ed25519_hd_key.dart';
-// import 'package:hex/hex.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-// class WalletService {
-//   static const String _infuraUrl = 'https://mainnet.infura.io/v3/98a0c3711b7646d39bdb249029f70c21'; // Replace with your Infura project ID
-//   final Web3Client _client;
-//   final FlutterSecureStorage _secureStorage;
-//   static const String _walletKey = 'wallet_data';
-//
-//   WalletService() :
-//         _client = Web3Client(_infuraUrl, http.Client()),
-//         _secureStorage = const FlutterSecureStorage();
-//
-//   // Generate new wallet
-//   Future<Map<String, String>> createWallet() async {
-//     // Generate mnemonic
-//     final mnemonic = bip39.generateMnemonic();
-//
-//     // Convert mnemonic to seed
-//     final seed = bip39.mnemonicToSeed(mnemonic);
-//
-//     // Derive private key
-//     final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(seed);
-//     final privateKey = HEX.encode(masterKey.key);
-//
-//     // Generate Ethereum address
-//     final credentials = EthPrivateKey.fromHex(privateKey);
-//     final address = credentials.address.hex;
-//
-//     // Store securely on device
-//     await _secureStorage.write(
-//         key: _walletKey,
-//         value: '''
-//       {
-//         "mnemonic": "$mnemonic",
-//         "privateKey": "$privateKey",
-//         "address": "$address"
-//       }
-//       '''
-//     );
-//
-//     return {
-//       'mnemonic': mnemonic,
-//       'address': address,
-//     };
-//   }
-//
-//   // Import wallet from mnemonic
-//   Future<String> importWallet(String mnemonic) async {
-//     if (!bip39.validateMnemonic(mnemonic)) {
-//       throw Exception('Invalid mnemonic phrase');
-//     }
-//
-//     final seed = bip39.mnemonicToSeed(mnemonic);
-//     final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(seed);
-//     final privateKey = HEX.encode(masterKey.key);
-//     final credentials = EthPrivateKey.fromHex(privateKey);
-//     final address = credentials.address.hex;
-//
-//     // Store securely on device
-//     await _secureStorage.write(
-//         key: _walletKey,
-//         value: '''
-//       {
-//         "mnemonic": "$mnemonic",
-//         "privateKey": "$privateKey",
-//         "address": "$address"
-//       }
-//       '''
-//     );
-//
-//     return address;
-//   }
-//
-//   // Get wallet balance
-//   Future<EtherAmount> getBalance(String address) async {
-//     final ethAddress = EthereumAddress.fromHex(address);
-//     return await _client.getBalance(ethAddress);
-//   }
-//
-//   // Send transaction
-//   Future<String> sendTransaction({
-//     required String toAddress,
-//     required BigInt amount,
-//   }) async {
-//     final walletData = await _secureStorage.read(key: _walletKey);
-//     if (walletData == null) throw Exception('No wallet found');
-//
-//     final data = Map<String, dynamic>.from(json.decode(walletData));
-//     final credentials = EthPrivateKey.fromHex(data['privateKey']);
-//
-//     final transaction = Transaction(
-//       to: EthereumAddress.fromHex(toAddress),
-//       value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
-//       maxGas: 21000, // Standard gas limit for ETH transfers
-//     );
-//
-//     final txHash = await _client.sendTransaction(
-//       credentials,
-//       transaction,
-//       chainId: 1, // 1 for mainnet
-//     );
-//
-//     return txHash;
-//   }
-//
-//   // Get transaction details
-//   Future<TransactionInformation?> getTransaction(String txHash) async {
-//     return await _client.getTransactionByHash(txHash);
-//   }
-//
-//   // Get current gas price
-//   Future<EtherAmount> getGasPrice() async {
-//     return await _client.getGasPrice();
-//   }
-//
-//   // Check if wallet exists
-//   Future<bool> hasWallet() async {
-//     final data = await _secureStorage.read(key: _walletKey);
-//     return data != null;
-//   }
-//
-//   // Get current wallet address
-//   Future<String?> getCurrentAddress() async {
-//     final data = await _secureStorage.read(key: _walletKey);
-//     if (data == null) return null;
-//     return Map<String, dynamic>.from(json.decode(data))['address'];
-//   }
-//
-//   void dispose() {
-//     _client.dispose();
-//   }
-// }
-
 import 'dart:async';
 import 'dart:convert';
 import 'package:web3dart/web3dart.dart';
@@ -600,7 +415,7 @@ class WalletService {
     return address;
   }
 
-  Future<Map<String, dynamic>> fetchBalances(String address) async {
+  Future<Map<String, dynamic>> fetchBalances(String address,) async {
     final ethAddress = EthereumAddress.fromHex(address);
     try {
       final ethBalance = await _ethereumClient.getBalance(ethAddress);
@@ -636,43 +451,154 @@ class WalletService {
     return await client.getBalance(ethAddress);
   }
 
+  Future<double> estimateTransactionFee(String token, String toAddress) async {
+    try {
+      final gasPrice = await _ethereumClient.getGasPrice();
+      final gasLimit = await _estimateGasLimit(toAddress, token);
+
+      print('calculating gas : ${(gasPrice.getValueInUnit(EtherUnit.ether) * gasLimit)}');
+
+      return (gasPrice.getValueInUnit(EtherUnit.ether) * gasLimit);
+    } catch (e) {
+      throw Exception('Fee estimation failed: ${e.toString()}');
+    }
+  }
+
+  Future<int> _estimateGasLimit(String toAddress, String token) async {
+    // Implement gas limit estimation logic
+    // This is a simplified version and should be replaced with more robust estimation
+    return token == 'ETH' ? 21000 : 100000;
+  }
+
+
   Future<String> sendTransaction({
     required String toAddress,
+    required String fromAddress,
     required BigInt amount,
     String chain = 'ETH',
   }) async {
-    final walletData = await _secureStorage.read(key: _walletKey);
-    if (walletData == null) throw Exception('No wallet found');
+    try {
+      // Fetch wallet data from secure storage
+      final walletData = await _secureStorage.read(key: _walletKey);
+      print('Fetched wallet data: $walletData');
 
-    final data = jsonDecode(walletData);
-    final credentials = EthPrivateKey.fromHex(data['privateKey']);
-    final ethAddress = EthereumAddress.fromHex(toAddress);
+      if (walletData == null) {
+        throw Exception('No wallet found in secure storage');
+      }
 
-    Web3Client client;
-    int chainId;
-    switch (chain) {
-      case 'BNB':
-        client = _bscClient;
-        chainId = 56; // BSC Mainnet
-        break;
-      case 'MATIC':
-        client = _polygonClient;
-        chainId = 137; // Polygon Mainnet
-        break;
-      default:
-        client = _ethereumClient;
-        chainId = 1; // Ethereum Mainnet
+      final List<dynamic> dataList = jsonDecode(walletData);
+      print('Decoded wallet data as list: $dataList');
+
+      // Find the wallet that matches the fromAddress
+      final wallet = dataList.firstWhere(
+            (entry) {
+          print('Checking wallet entry: $entry');
+          return entry['address'].toLowerCase() == fromAddress.toLowerCase();
+        },
+        orElse: () {
+          print('No matching wallet found for address: $fromAddress');
+          throw Exception('Private key not found for the given fromAddress');
+        },
+      );
+
+      print('Matching wallet found: $wallet');
+
+      final credentials = EthPrivateKey.fromHex(wallet['privateKey']);
+      print('Created credentials for private key.');
+
+      final ethAddress = EthereumAddress.fromHex(toAddress);
+      print('Parsed destination address: $ethAddress');
+
+      Web3Client client;
+      int chainId;
+
+      // Determine client and chainId based on the network
+      switch (chain) {
+        case 'BNB':
+          client = _bscClient;
+          chainId = 97; // Binance Smart Chain Testnet
+          break;
+        case 'MATIC':
+          client = _polygonClient;
+          chainId = 80001; // Polygon Mumbai Testnet
+          break;
+        default:
+          client = _ethereumClient;
+          chainId = 11155111; // Sepolia Ethereum Testnet
+      }
+
+      print('Selected client and chain ID: $chain, $chainId');
+
+      // Create the transaction
+      final transaction = Transaction(
+        to: ethAddress,
+        value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
+        maxGas: 21000,
+      );
+
+      print('Prepared transaction details:');
+      print('  From Address: $fromAddress');
+      print('  To Address: $toAddress');
+      print('  Amount (Wei): $amount');
+      print('  Chain: $chain');
+      print('  Chain ID: $chainId');
+
+      // Send transaction
+      final txHash = await client.sendTransaction(credentials, transaction, chainId: chainId);
+
+      print('Transaction successful!');
+      print('Transaction Hash: $txHash');
+
+      return txHash;
+    } catch (e) {
+      print('Error sending transaction: ${e.toString()}');
+      rethrow;
     }
-
-    final transaction = Transaction(
-      to: ethAddress,
-      value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
-      maxGas: 21000,
-    );
-
-    return await client.sendTransaction(credentials, transaction,
-        chainId: chainId);
   }
+
+
+
+
+  // Future<String> sendTransaction({
+  //   required String toAddress,
+  //   required String fromAddress,
+  //   required BigInt amount,
+  //   String chain = 'ETH',
+  // }) async {
+  //   final walletData = await _secureStorage.read(key: _walletKey);
+  //   if (walletData == null) throw Exception('No wallet found');
+  //
+  //   final data = jsonDecode(walletData);
+  //   final credentials = EthPrivateKey.fromHex(data['privateKey']);
+  //   final ethAddress = EthereumAddress.fromHex(toAddress);
+  //
+  //   Web3Client client;
+  //   int chainId;
+  //   switch (chain) {
+  //     case 'BNB':
+  //       client = _bscClient;
+  //       chainId = 56; // BSC Mainnet
+  //       break;
+  //     case 'MATIC':
+  //       client = _polygonClient;
+  //       chainId = 137; // Polygon Mainnet
+  //       break;
+  //     default:
+  //       client = _ethereumClient;
+  //       chainId = 11155111; // Ethereum Mainnet
+  //   }
+  //
+  //   final transaction = Transaction(
+  //     to: ethAddress,
+  //     value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
+  //     maxGas: 21000,
+  //   );
+  //
+  //   return await client.sendTransaction(credentials, transaction,
+  //       chainId: chainId);
+  // }
+
+
 
   Future<void> fetchTransactions(String walletAddress) async {
     final String apiUrl = "https://api-sepolia.etherscan.io/api"
