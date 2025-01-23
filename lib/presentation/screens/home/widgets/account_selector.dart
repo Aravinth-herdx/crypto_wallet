@@ -1,3 +1,4 @@
+import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,7 +68,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     _buildActionButton(
                       'Create Account',
                       CupertinoIcons.plus_circle_fill,
-                          () {
+                      () {
                         Navigator.pop(context);
                         _showCreateAccountDialog(context);
                       },
@@ -75,7 +76,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     _buildActionButton(
                       'Import Account',
                       CupertinoIcons.arrow_down_circle_fill,
-                          () {
+                      () {
                         Navigator.pop(context);
                         _showImportAccountDialog(context);
                       },
@@ -100,8 +101,6 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                       final AccountNew account = entry.value;
                       return _buildAccountItem(idx, account);
                     }).toList(),
-
-
                   ],
                 ),
               ),
@@ -115,12 +114,17 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
   Widget _buildAccountItem(int index, AccountNew account) {
     final accountState = ref.watch(accountProvider);
     final isSelected = accountState.selectedAccount?.address == account.address;
-    final formattedAddress = '${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}';
+    final formattedAddress =
+        '${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}';
 
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () {
         ref.read(accountProvider.notifier).selectAccount(account);
+        ref.read(walletBalanceProvider.notifier).fetchTransactions(
+            ref.watch(accountProvider).selectedAccount?.address ?? '');
+        ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+            ref.watch(accountProvider).selectedAccount?.address ?? '');
         Navigator.pop(context);
       },
       child: Container(
@@ -194,30 +198,32 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                       fontSize: 13,
                     ),
                     maxLines: 1, // Restrict the address to a single line
-                    overflow: TextOverflow.ellipsis, // Handle long addresses gracefully
+                    overflow: TextOverflow
+                        .ellipsis, // Handle long addresses gracefully
                   ),
                 ],
               ),
             ),
 
             // const Spacer(),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(
-            CupertinoIcons.eye,
-            color: CupertinoColors.systemGrey, // Changed color
-            size: 20.0, // Reduced size
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => AccountDetailsScreen(account: account),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: const Icon(
+                CupertinoIcons.eye,
+                color: CupertinoColors.systemGrey, // Changed color
+                size: 20.0, // Reduced size
               ),
-            );
-          },
-        ),
-        Column(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) =>
+                        AccountDetailsScreen(account: account),
+                  ),
+                );
+              },
+            ),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
@@ -242,7 +248,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
     );
   }
 
-  Widget _buildActionButton(String title, IconData icon, VoidCallback onPressed) {
+  Widget _buildActionButton(
+      String title, IconData icon, VoidCallback onPressed) {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       onPressed: onPressed,
@@ -313,7 +320,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => const WalletImportScreen(), // Navigate to WalletImportScreen using CupertinoPageRoute
+                  builder: (context) =>
+                      const WalletImportScreen(), // Navigate to WalletImportScreen using CupertinoPageRoute
                 ),
               );
             },
@@ -335,12 +343,12 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
           _buildActionButton(
             'Create Account',
             CupertinoIcons.plus_circle_fill,
-                () => _showCreateAccountDialog(context),
+            () => _showCreateAccountDialog(context),
           ),
           _buildActionButton(
             'Import Account',
             CupertinoIcons.arrow_down_circle_fill,
-                () => _showImportAccountDialog(context),
+            () => _showImportAccountDialog(context),
           ),
         ],
       );
@@ -349,7 +357,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
       return const SizedBox.shrink(); // or loading indicator
     }
 
-    final formattedAddress = '${selectedAccount.address.substring(0, 6)}...${selectedAccount.address.substring(selectedAccount.address.length - 4)}';
+    final formattedAddress =
+        '${selectedAccount.address.substring(0, 6)}...${selectedAccount.address.substring(selectedAccount.address.length - 4)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

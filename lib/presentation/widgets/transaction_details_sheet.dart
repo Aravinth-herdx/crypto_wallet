@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../core/models/transaction_history.dart';
+import '../screens/home/models/transaction.dart';
 
 class TransactionDetailsSheet extends StatelessWidget {
-  final TransactionHistory transaction;
+  final Transaction transaction;
 
   const TransactionDetailsSheet({
     Key? key,
@@ -19,11 +20,13 @@ class TransactionDetailsSheet extends StatelessWidget {
           _buildDetailRow('Hash', transaction.hash),
           _buildDetailRow('From', transaction.from),
           _buildDetailRow('To', transaction.to),
-          _buildDetailRow('Amount', '${transaction.amount} ${transaction.token}'),
+          _buildDetailRow(
+              'Amount', '${transaction.amount} ${transaction.network}'),
           _buildDetailRow('Network', transaction.network),
-          _buildDetailRow('Fee', '${transaction.fee} ${transaction.token}'),
+          _buildDetailRow('Fee',
+              '${transaction.fee.toStringAsFixed(7)} ${transaction.network}'),
           _buildDetailRow('Status', transaction.status.toString()),
-          _buildDetailRow('Date', transaction.timestamp.toString()),
+          _buildDetailRow('Date', transaction.date.toString()),
         ],
       ),
       actions: [
@@ -46,6 +49,9 @@ class TransactionDetailsSheet extends StatelessWidget {
             style: const TextStyle(
               color: CupertinoColors.systemGrey,
             ),
+          ),
+          const SizedBox(
+            width: 25,
           ),
           Flexible(
             child: Text(

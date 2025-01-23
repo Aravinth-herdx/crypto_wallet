@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/websocket/wallet_balance_state.dart';
+import '../../../../providers/accouns_provider.dart';
 import '../provider/import_wallet_provider.dart'; // The provider we just created
 
 class WalletImportScreen extends ConsumerStatefulWidget {
@@ -64,14 +66,17 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
 
   void _importWallet() async {
     final mnemonic = _mnemonicController.text.trim();
-    final result = await ref.read(walletImportProvider.notifier).importWallet(mnemonic.trim(),ref);
-    if(result){
+    final result = await ref
+        .read(walletImportProvider.notifier)
+        .importWallet(mnemonic.trim(), ref);
+    if (result) {
       _handleSuccess();
     }
   }
 
   void _showErrorDialog([String? errorMessage]) {
-    final message = errorMessage ?? 'Sorry, Account not imported. Maybe the private key is invalid or the account already exists. Please check.';
+    final message = errorMessage ??
+        'Sorry, Account not imported. Maybe the private key is invalid or the account already exists. Please check.';
 
     showCupertinoDialog(
       context: context,
@@ -88,15 +93,16 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
     );
   }
 
-
   void _handleSuccess() {
     _mnemonicController.clear();
     Future.delayed(const Duration(seconds: 1), () {
+      ref.read(walletBalanceProvider.notifier).fetchTransactions(
+          ref.watch(accountProvider).selectedAccount?.address ?? '');
+      ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+          ref.watch(accountProvider).selectedAccount?.address ?? '');
       Navigator.pop(context);
     });
   }
-
-
 
   @override
   void dispose() {

@@ -1,16 +1,22 @@
+import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
+import 'package:crypto_wallet/presentation/screens/home/models/transaction.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/transaction_history.dart';
 import '../widgets/transaction_details_sheet.dart';
 import '../widgets/transaction_list_item.dart';
+
 //
-class TransactionHistoryScreen extends StatefulWidget {
+class TransactionHistoryScreen extends ConsumerStatefulWidget {
   const TransactionHistoryScreen({super.key});
 
   @override
-  State<TransactionHistoryScreen> createState() => _TransactionHistoryScreenState();
+  ConsumerState<TransactionHistoryScreen> createState() =>
+      _TransactionHistoryScreenState();
 }
 
-class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
+class _TransactionHistoryScreenState
+    extends ConsumerState<TransactionHistoryScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<TransactionHistory> _transactions = transactionsTestData;
   bool _isLoading = false;
@@ -44,33 +50,38 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final walletProvider = ref.watch(walletBalanceProvider);
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text('Transaction History'),
       ),
       child: SafeArea(
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: _transactions.length + (_isLoading ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index == _transactions.length) {
-              return const Center(
-                child: CupertinoActivityIndicator(),
-              );
-            }
+        child: walletProvider.transaction.isEmpty
+            ? Center(
+                child: Text('No History'),
+              )
+            : ListView.builder(
+                controller: _scrollController,
+                itemCount: walletProvider.transaction.length,
+                itemBuilder: (context, index) {
+                  // if (index == _transactions.length) {
+                  //   return const Center(
+                  //     child: CupertinoActivityIndicator(),
+                  //   );
+                  // }
 
-            final transaction = _transactions[index];
-            return TransactionListItem(
-              transaction: transaction,
-              onTap: () => _showTransactionDetails(transaction),
-            );
-          },
-        ),
+                  final transaction = walletProvider.transaction[index];
+                  return TransactionListItem(
+                    transaction: transaction,
+                    onTap: () => _showTransactionDetails(transaction),
+                  );
+                },
+              ),
       ),
     );
   }
 
-  void _showTransactionDetails(TransactionHistory transaction) {
+  void _showTransactionDetails(Transaction transaction) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => TransactionDetailsSheet(transaction: transaction),

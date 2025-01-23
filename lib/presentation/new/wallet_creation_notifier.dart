@@ -18,6 +18,8 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
     state = state.copyWith(isPassphraseEnabled: value);
   }
 
+
+
   Future<void> getMnemonic({String? passphrase}) async {
     try {
       state = state.copyWith(isLoading: true, error: null);

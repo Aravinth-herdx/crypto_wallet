@@ -20,14 +20,14 @@ class HomeScreen extends StatelessWidget {
               currency: 'USD',
             ),
             SizedBox(height: 20),
-            TokenList(
-              tokens: [
-                {'symbol': 'ETH', 'balance': '2.5', 'value': '4,500.00'},
-                {'symbol': 'BNB', 'balance': '10.0', 'value': '3,000.00'},
-                {'symbol': 'MATIC', 'balance': '1000.0', 'value': '1,200.00'},
-                {'symbol': 'SOL', 'balance': '50.0', 'value': '5,000.00'},
-              ],
-            ),
+            // TokenList(
+            //   tokens: [
+            //     {'symbol': 'ETH', 'balance': '2.5', 'value': '4,500.00'},
+            //     {'symbol': 'BNB', 'balance': '10.0', 'value': '3,000.00'},
+            //     {'symbol': 'MATIC', 'balance': '1000.0', 'value': '1,200.00'},
+            //     {'symbol': 'SOL', 'balance': '50.0', 'value': '5,000.00'},
+            //   ],
+            // ),
           ],
         ),
       ),
