@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../providers/accouns_provider.dart';
 import '../../../new/wallet_creation.dart';
+import '../../../new/wallet_provider.dart';
 import '../../detail/account_detail.dart';
 import '../../wallet_import/screen/wallet_import_screen.dart';
 import '../models/account.dart';
@@ -17,6 +18,7 @@ class AccountSelector extends ConsumerStatefulWidget {
 }
 
 class _AccountSelectorState extends ConsumerState<AccountSelector> {
+
   void _showAccountMenu(BuildContext context) {
     final accountState = ref.read(accountProvider);
 
@@ -285,8 +287,15 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
           ),
           CupertinoDialogAction(
             child: const Text('Create'),
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              // final amount = BigInt.from(0.001 * 1e18);
+              // print(amount);// Convert 0.01 ETH to wei
+              // await ref.read(walletCreationProvider.notifier).sendTransaction(
+              //   toAddress: '0x49534011FB6caC5aaDA5E5C993E256fB2AeA391D',
+              //   amount: amount,
+              //   fromAddress: '0xbEdd0E92F555A369Db152A0dA500628d721faD56',
+              // );
+              // Navigator.pop(context);
               // Implement account creation logic
               Navigator.push(
                 context,

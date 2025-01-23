@@ -39,22 +39,21 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
     }
   }
 
-
-  Future<void> createWallet(WidgetRef ref,{String? passphrase}) async {
+  Future<void> createWallet(WidgetRef ref, {String? passphrase}) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
 
       final walletData = await _walletService.generateWalletAddress(
-          passphrase: passphrase,
-          mnemonic: state.mnemonic!
-      );
+          passphrase: passphrase, mnemonic: state.mnemonic!);
       print('address created');
       print(walletData['address']);
       print(walletData['mnemonic']?.split(' '));
       print(walletData['privateKey']);
 
       // Add the new wallet address to accounts
-      await ref.read(accountProvider.notifier).addWalletAccount(walletData['address']!,walletData['privateKey']!);
+      await ref
+          .read(accountProvider.notifier)
+          .addWalletAccount(walletData['address']!, walletData['privateKey']!);
       print('account added created');
       print(walletData['address']);
       print(walletData['mnemonic']?.split(' '));
@@ -69,6 +68,27 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to create wallet: ${e.toString()}',
+      );
+    }
+  }
+
+  Future<void> sendTransaction({
+    required String toAddress,
+    required BigInt amount,
+    required String fromAddress,
+  }) async {
+    try {
+      final walletData = await _walletService.sendTransaction(
+        toAddress: toAddress,
+        fromAddress: fromAddress,
+        amount: amount,
+      );
+      print(walletData);
+    } catch (e) {
+      print('Error sending transaction: ${e.toString()}');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to send transaction: ${e.toString()}',
       );
     }
   }

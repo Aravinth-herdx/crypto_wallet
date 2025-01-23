@@ -1,39 +1,47 @@
 class SendFormState {
-  final String selectedToken;
   final String address;
   final String amount;
-  final String errorMessage;
+  final String selectedToken;
+  final bool isFormValid;
   final bool isSubmitting;
   final bool isSuccess;
-  final bool isFormValid;
+  final String errorMessage;
+  final double transactionFee;
 
   SendFormState({
-    this.selectedToken = 'ETH',
     this.address = '',
     this.amount = '',
-    this.errorMessage = '',
+    this.selectedToken = 'ETH',
+    this.isFormValid = false,
     this.isSubmitting = false,
     this.isSuccess = false,
-    this.isFormValid = false,
+    this.errorMessage = '',
+    this.transactionFee = 0.0,
   });
 
   SendFormState copyWith({
-    String? selectedToken,
     String? address,
     String? amount,
-    String? errorMessage,
+    String? selectedToken,
+    bool? isFormValid,
     bool? isSubmitting,
     bool? isSuccess,
-    bool? isFormValid,
+    String? errorMessage,
+    double? transactionFee,
   }) {
     return SendFormState(
-      selectedToken: selectedToken ?? this.selectedToken,
       address: address ?? this.address,
       amount: amount ?? this.amount,
-      errorMessage: errorMessage ?? this.errorMessage,
+      selectedToken: selectedToken ?? this.selectedToken,
+      isFormValid: isFormValid ?? this.isFormValid,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isSuccess: isSuccess ?? this.isSuccess,
-      isFormValid: isFormValid ?? this.isFormValid,
+      errorMessage: errorMessage ?? this.errorMessage,
+      transactionFee: transactionFee ?? this.transactionFee,
     );
+  }
+
+  factory SendFormState.empty() {
+    return SendFormState();
   }
 }

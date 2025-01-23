@@ -68,13 +68,7 @@ class HomeScreenNew extends ConsumerWidget {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('CryptoVault'),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.settings),
-          onPressed: () {
-            // Navigate to settings
-          },
-        ),
+
       ),
       child: SafeArea(
         child: ListView(

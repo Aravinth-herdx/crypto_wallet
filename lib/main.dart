@@ -21,9 +21,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final isDarkMode = ref.watch(themeProviderNotifier);
+    final isDarkMode = ref.watch(themeProviderNotifier);
 
-    return const CupertinoApp(
+    return  CupertinoApp(
       title: 'Crypto Wallet',
       supportedLocales: [
         Locale('en'),
@@ -36,11 +36,11 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: CupertinoThemeData(brightness: Brightness.light),
-      // theme: isDarkMode
-      //     ? const CupertinoThemeData(brightness: Brightness.dark)
-      //     : const CupertinoThemeData(brightness: Brightness.light),
-      home: BiometricAuthScreen(),
+      // theme: CupertinoThemeData(brightness: Brightness.light),
+      theme: isDarkMode
+          ? const CupertinoThemeData(brightness: Brightness.dark)
+          : const CupertinoThemeData(brightness: Brightness.light),
+      home: AppRouter(),
       // home: WalletSetupScreen (),
     );
   }

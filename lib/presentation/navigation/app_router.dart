@@ -47,12 +47,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             icon: Icon(CupertinoIcons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.account_balance_wallet_outlined,
-            ),
-            label: 'Balance',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.account_balance_wallet_outlined,),
+          //   label: 'Balance',
+          // ),
+
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.clock),
             label: 'History',
@@ -71,16 +70,16 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         switch (index) {
           case 0:
             // return const HomeScreen();
-            return HomeScreenNew();
-          case 1:
-            return const WalletSetupScreen();
+            return  HomeScreenNew ();
+          // case 1:
+          //   return const WalletSetupScreen();
           // case 2:
           //   return const SendScreen();
-          case 2:
+          case 1:
             return const TransactionHistoryScreen();
-          case 3:
+          case 2:
             return const SendScreen();
-          case 4:
+          case 3:
             return const SettingsScreen();
           default:
             return HomeScreen();

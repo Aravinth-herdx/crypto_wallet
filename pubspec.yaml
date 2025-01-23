@@ -58,6 +58,7 @@ dependencies:
   hdkey: ^0.0.1
   lottie: ^3.2.0
   skeletonizer: ^1.4.3
+  mobile_scanner: ^6.0.3
 
 dev_dependencies:
   flutter_test:
