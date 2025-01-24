@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../core/localization/localization_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../navigation/app_router.dart';
 
@@ -46,8 +48,7 @@ class _BiometricAuthScreenState extends ConsumerState<BiometricAuthScreen> {
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const AppRouter())
-    );
+        MaterialPageRoute(builder: (context) => const AppRouter()));
   }
 
   @override
@@ -58,9 +59,8 @@ class _BiometricAuthScreenState extends ConsumerState<BiometricAuthScreen> {
         child: Center(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
-            child: _isVerified
-                ? _buildVerifiedView()
-                : _buildAuthenticationView(),
+            child:
+                _isVerified ? _buildVerifiedView() : _buildAuthenticationView(),
           ),
         ),
       ),
@@ -75,47 +75,75 @@ class _BiometricAuthScreenState extends ConsumerState<BiometricAuthScreen> {
           duration: const Duration(milliseconds: 300),
           child: _isAuthenticating
               ? const Icon(
-            Icons.fingerprint,
-            size: 120,
-            color: Colors.white,
-          )
-              : Column(
-            children: [
-              const Icon(
-                Icons.lock,
-                size: 80,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Authentication Required',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  Icons.fingerprint,
+                  size: 120,
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                )
+              : Column(
+                  children: [
+                    const Icon(
+                      Icons.lock,
+                      size: 80,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 20),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        ref.watch(languageProvider);
+                        return Text(localizedText('authenauth_required'),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ));
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(languageProvider);
+                          return Text(
+                            localizedText('setup_biometrics'),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white70,
+                                ),
+                            textAlign: TextAlign.center,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _performBiometricAuth,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white12,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 15),
+                      ),
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(languageProvider);
+                          return Text(
+                            localizedText('try_again'),
+                            // style: const TextStyle(
+                            //   fontSize: 13,
+                            //   fontWeight: FontWeight.w600,
+                            //   color: CupertinoColors.systemGrey,
+                            // ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Use Touch ID or Face ID to unlock',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white70,
-                ),
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _performBiometricAuth,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white12,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 15
-                  ),
-                ),
-                child: const Text('Try Again'),
-              )
-            ],
-          ),
         ),
       ],
     );
@@ -129,8 +157,8 @@ class _BiometricAuthScreenState extends ConsumerState<BiometricAuthScreen> {
         children: [
           Lottie.asset(
             'assets/animation/ani.json',
-            width:100,
-            height:100,
+            width: 100,
+            height: 100,
             fit: BoxFit.fill,
             repeat: false,
           ),
@@ -138,24 +166,23 @@ class _BiometricAuthScreenState extends ConsumerState<BiometricAuthScreen> {
           Text(
             'Identity Verified',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
           ),
           const SizedBox(height: 15),
           Text(
             'You have been securely authenticated.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
           ),
           const SizedBox(height: 30),
         ],
       ),
     );
   }
-
 }

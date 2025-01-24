@@ -83,6 +83,8 @@ class WalletBalanceProvider extends StateNotifier<WalletBalanceState> {
   }
 
   Future<void> fetchBalanceHttp(String address) async {
+    print('Adress1');
+    print(address);
     if (address.isNotEmpty) {
       state = state.copyWith(isError: false, balance: '0.0');
       try {
@@ -104,7 +106,8 @@ class WalletBalanceProvider extends StateNotifier<WalletBalanceState> {
             // Remove trailing zeros
             final formattedBalance =
                 double.parse(balanceInEther.toStringAsFixed(4)).toString();
-
+            print('formattedBalance');
+            print(formattedBalance);
             // Update state with the fetched balance
             state = state.copyWith(
               // isLoading: false,
@@ -202,6 +205,8 @@ class WalletBalanceProvider extends StateNotifier<WalletBalanceState> {
   }
 
   Future<void> fetchTransactions(String address) async {
+    print('Adress');
+    print(address);
     if (address != '') {
       final url =
           'https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=$address&startblock=0&endblock=99999999&page=1&offset=10&sort=desc&apikey=7VF9J4C4QBYKZPRV19G4374M3YPKJ2NAJT';
@@ -216,16 +221,18 @@ class WalletBalanceProvider extends StateNotifier<WalletBalanceState> {
           if (results.isNotEmpty) {
             final result =
                 results.map((json) => Transaction.fromJson(json)).toList();
-            // for (final a in result) {
-            //   print(a.toJson());
-            // }
+            for (final a in result) {
+              print(a.toJson());
+            }
             state = state.copyWith(transaction: result);
           }
         } else {
+          print(response.body);
           state = state.copyWith(transaction: []);
           // throw Exception("Error: ${data['message']}");
         }
       } else {
+        print(response.body);
         state = state.copyWith(transaction: []);
         // throw Exception("Failed to fetch transactions: ${response.statusCode}");
       }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../core/constants/text_widget.dart';
 import '../../core/models/transaction_history.dart';
 import '../screens/home/models/transaction.dart';
 
@@ -14,25 +15,29 @@ class TransactionDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
-      title: const Text('Transaction Details'),
+      title: const TextWidget(
+        textKey: 'transaction_details',
+      ),
       message: Column(
         children: [
-          _buildDetailRow('Hash', transaction.hash),
-          _buildDetailRow('From', transaction.from),
-          _buildDetailRow('To', transaction.to),
+          _buildDetailRow('hash', transaction.hash),
+          _buildDetailRow('from', transaction.from),
+          _buildDetailRow('to', transaction.to),
           _buildDetailRow(
-              'Amount', '${transaction.amount} ${transaction.network}'),
-          _buildDetailRow('Network', transaction.network),
-          _buildDetailRow('Fee',
+              'amount', '${transaction.amount} ${transaction.network}'),
+          _buildDetailRow('network', transaction.network),
+          _buildDetailRow('fee',
               '${transaction.fee.toStringAsFixed(7)} ${transaction.network}'),
-          _buildDetailRow('Status', transaction.status.toString()),
-          _buildDetailRow('Date', transaction.date.toString()),
+          _buildDetailRow('status', transaction.status.toString()),
+          _buildDetailRow('date', transaction.date.toString()),
         ],
       ),
       actions: [
         CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
+          child: const TextWidget(
+            textKey: 'close',
+          ),
         ),
       ],
     );
@@ -44,8 +49,8 @@ class TransactionDetailsSheet extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
+          TextWidget(
+            textKey: label,
             style: const TextStyle(
               color: CupertinoColors.systemGrey,
             ),

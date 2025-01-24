@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/text_widget.dart';
+import '../../../../core/localization/localization_provider.dart';
 import '../models/network.dart';
 
 class NetworkSelector extends StatefulWidget {
@@ -74,16 +77,31 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Select Network',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(languageProvider);
+                          return Text(
+                            overflow: TextOverflow.ellipsis,
+                            localizedText('select_network'),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      child: const Text('Done'),
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          ref.watch(languageProvider);
+                          return Text(
+                            localizedText('done'),
+                          );
+                        },
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -92,30 +110,38 @@ class _NetworkSelectorState extends State<NetworkSelector> {
               Expanded(
                 child: ListView(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'MAINNET NETWORKS',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: CupertinoColors.systemGrey,
-                        ),
-                      ),
-                    ),
+                    Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            ref.watch(languageProvider);
+                            return Text(
+                              localizedText('mainnet_networks'),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                            );
+                          },
+                        )),
                     ...networks.where((n) => !n.isTestnet).map((network) =>
                         _buildNetworkItem(networks.indexOf(network), network)),
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'TEST NETWORKS',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: CupertinoColors.systemGrey,
-                        ),
-                      ),
-                    ),
+                    Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            ref.watch(languageProvider);
+                            return Text(
+                              localizedText('test_networks'),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                            );
+                          },
+                        )),
                     ...networks.where((n) => n.isTestnet).map((network) =>
                         _buildNetworkItem(networks.indexOf(network), network)),
                     // const SizedBox(height: 16),
@@ -214,21 +240,26 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                   ),
                   const SizedBox(height: 4),
                   if (!isImplemented)
-                    Text(
-                      'Not Implemented',
-                      style: const TextStyle(
-                        color: CupertinoColors.systemRed,
-                        fontSize: 13,
-                      ),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        ref.watch(languageProvider);
+                        return Text(
+                          localizedText('not_implemented'),
+                          style: const TextStyle(
+                            color: CupertinoColors.systemRed,
+                            fontSize: 13,
+                          ),
+                        );
+                      },
                     )
-                  else
-                    Text(
-                      'Chain ID: ${network.chainId}',
-                      style: const TextStyle(
-                        color: CupertinoColors.systemGrey,
-                        fontSize: 13,
-                      ),
-                    ),
+                  // else
+                  //   Text(
+                  //     'Chain ID: ${network.chainId}',
+                  //     style: const TextStyle(
+                  //       color: CupertinoColors.systemGrey,
+                  //       fontSize: 13,
+                  //     ),
+                  //   ),
                 ],
               ),
             ),
@@ -251,8 +282,8 @@ class _NetworkSelectorState extends State<NetworkSelector> {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 16, bottom: 8),
-          child: Text(
-            'CURRENT NETWORK',
+          child: TextWidget(
+            textKey: 'current_network',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -301,13 +332,18 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          'Chain ID: ${networks[selectedNetworkIndex].chainId}',
-                          style: const TextStyle(
-                            color: CupertinoColors.systemGrey,
-                            fontSize: 13,
-                          ),
-                        ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            ref.watch(languageProvider);
+                            return Text(
+                              '${localizedText('chain_id')}: ${networks[selectedNetworkIndex].chainId}',
+                              style: const TextStyle(
+                                color: CupertinoColors.systemGrey,
+                                fontSize: 13,
+                              ),
+                            );
+                          },
+                        )
                       ],
                     ),
                   ],

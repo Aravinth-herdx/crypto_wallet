@@ -1,3 +1,4 @@
+import 'package:crypto_wallet/core/localization/localization_provider.dart';
 import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
 import 'package:crypto_wallet/providers/accouns_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,12 +41,13 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   @override
   Widget build(BuildContext context) {
+    final language = ref.watch(languageProvider);
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home),
-            label: 'Home',
+            icon: const Icon(CupertinoIcons.home),
+            label: language == 'en' ? 'Home' : 'வீடு',
           ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.account_balance_wallet_outlined,),
@@ -53,16 +55,16 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           // ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.clock),
-            label: 'History',
+            icon: const Icon(CupertinoIcons.clock),
+            label: language == 'en' ? 'History' : 'வரலாறு',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.arrow_right_arrow_left),
-            label: 'Send',
+            icon: const Icon(CupertinoIcons.arrow_right_arrow_left),
+            label: language == 'en' ? 'Send' : 'அனுப்பு',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.settings),
-            label: 'Settings',
+            icon: const Icon(CupertinoIcons.settings),
+            label: language == 'en' ? 'Settings' : 'அமைப்புகள்',
           ),
         ],
       ),
@@ -70,7 +72,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         switch (index) {
           case 0:
             // return const HomeScreen();
-            return  HomeScreenNew ();
+            return HomeScreenNew();
           // case 1:
           //   return const WalletSetupScreen();
           // case 2:

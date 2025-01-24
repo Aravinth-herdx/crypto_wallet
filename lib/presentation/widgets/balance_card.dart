@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../core/constants/text_widget.dart';
+
 class BalanceCard extends StatelessWidget {
   final String totalBalance;
   final String currency;
@@ -20,8 +22,8 @@ class BalanceCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            'Total Balance',
+          const TextWidget(
+            textKey: 'total_balance',
             style: TextStyle(color: CupertinoColors.white),
           ),
           const SizedBox(height: 8),

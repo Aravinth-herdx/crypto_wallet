@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../core/constants/text_widget.dart';
+
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -19,7 +21,9 @@ class ConfirmationDialog extends StatelessWidget {
       content: Text(message),
       actions: [
         CupertinoDialogAction(
-          child: const Text('Cancel'),
+          child: const TextWidget(
+            textKey: 'cancel',
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         CupertinoDialogAction(
@@ -28,7 +32,9 @@ class ConfirmationDialog extends StatelessWidget {
             onConfirm();
             Navigator.pop(context);
           },
-          child: const Text('Confirm'),
+          child: const TextWidget(
+            textKey: 'confirm',
+          ),
         ),
       ],
     );

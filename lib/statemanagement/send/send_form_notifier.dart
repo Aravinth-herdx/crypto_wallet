@@ -12,12 +12,12 @@ class SendFormNotifier extends StateNotifier<SendFormState> {
     _validateForm();
   }
 
-  clearError(){
-    state = state.copyWith(errorMessage:'' );
+  clearError() {
+    state = state.copyWith(errorMessage: '');
   }
 
-  clearState(){
-    state =SendFormState.empty();
+  clearState() {
+    state = SendFormState.empty();
   }
 
   void updateAddress(String address) {
@@ -33,9 +33,7 @@ class SendFormNotifier extends StateNotifier<SendFormState> {
   Future<void> _calculateTransactionFee() async {
     try {
       final fee = await _walletService.estimateTransactionFee(
-          state.selectedToken,
-          state.address
-      );
+          state.selectedToken, state.address);
       state = state.copyWith(transactionFee: fee);
     } catch (e) {
       state = state.copyWith(errorMessage: 'Fee calculation failed');
@@ -65,8 +63,8 @@ class SendFormNotifier extends StateNotifier<SendFormState> {
     return parsedAmount != null && parsedAmount > 0;
   }
 
-  void submitTransaction(String fromAddress) async {
-    if (!state.isFormValid) return;
+  Future<bool> submitTransaction(String fromAddress) async {
+    if (!state.isFormValid) return false;
 
     state = state.copyWith(isSubmitting: true, errorMessage: '');
 
@@ -74,7 +72,8 @@ class SendFormNotifier extends StateNotifier<SendFormState> {
       await _walletService.sendTransaction(
         fromAddress: fromAddress,
         toAddress: state.address,
-        amount: BigInt.parse((double.parse(state.amount) * 1e18).toStringAsFixed(0)),
+        amount: BigInt.parse(
+            (double.parse(state.amount) * 1e18).toStringAsFixed(0)),
         // token: state.selectedToken,
       );
 
@@ -83,11 +82,13 @@ class SendFormNotifier extends StateNotifier<SendFormState> {
         isSuccess: true,
         errorMessage: '',
       );
+      return true;
     } catch (e) {
       state = state.copyWith(
         isSubmitting: false,
         errorMessage: e.toString(),
       );
+      return false;
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/text_widget.dart';
 import '../../../providers/accouns_provider.dart';
 import '../../widgets/balance_card.dart';
 import '../../widgets/token_list.dart';
@@ -66,9 +67,10 @@ class HomeScreenNew extends ConsumerWidget {
     }
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('CryptoVault'),
-
+      navigationBar: const CupertinoNavigationBar(
+        middle: TextWidget(
+          textKey: 'crypto_vault',
+        ),
       ),
       child: SafeArea(
         child: ListView(
@@ -88,7 +90,7 @@ class HomeScreenNew extends ConsumerWidget {
                 height: 80,
                 width: 20,
               ),
-              Center(
+              const Center(
                 child: CupertinoActivityIndicator(),
               ),
             ] else ...[

@@ -1,6 +1,8 @@
+import 'package:crypto_wallet/core/localization/localization_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/text_widget.dart';
 import '../../../../core/services/websocket/wallet_balance_state.dart';
 import '../../../../providers/accouns_provider.dart';
 import '../provider/import_wallet_provider.dart'; // The provider we just created
@@ -30,7 +32,9 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('Import Wallet'),
+        middle: TextWidget(
+          textKey: 'import_wallet',
+        ),
       ),
       child: SafeArea(
         child: Padding(
@@ -38,14 +42,16 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Enter your 12-word recovery phrase',
+              const TextWidget(
+                textKey: 'enter_your_private_key',
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               CupertinoTextField(
                 controller: _mnemonicController,
-                placeholder: 'Enter mnemonic phrase',
+                placeholder: ref.watch(languageProvider) == 'en'
+                    ? 'Enter key'
+                    : 'விசையை உள்ளிடவும்',
                 maxLines: 3,
                 padding: const EdgeInsets.all(12),
               ),
@@ -55,7 +61,9 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
               else
                 CupertinoButton.filled(
                   onPressed: _importWallet,
-                  child: const Text('Import Wallet'),
+                  child: const TextWidget(
+                    textKey: 'import_wallet',
+                  ),
                 ),
             ],
           ),
@@ -81,11 +89,15 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('Import Error'),
+        title: const TextWidget(
+          textKey: 'import_error',
+        ),
         content: Text(message),
         actions: [
           CupertinoDialogAction(
-            child: const Text('OK'),
+            child: const TextWidget(
+              textKey: 'ok',
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

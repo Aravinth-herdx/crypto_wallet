@@ -6,7 +6,7 @@
     <application
         android:label="crypto_wallet"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/crypto">
         <activity
             android:name=".MainActivity"
             android:exported="true"
