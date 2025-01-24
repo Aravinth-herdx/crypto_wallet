@@ -4,6 +4,7 @@ import 'package:crypto_wallet/providers/accouns_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/text_widget.dart';
 import '../../core/models/transaction_history.dart';
 
 class TransactionListItem extends ConsumerStatefulWidget {
@@ -30,7 +31,7 @@ class _TransactionListItemState extends ConsumerState<TransactionListItem> {
       onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               color: CupertinoColors.separator,
@@ -52,16 +53,27 @@ class _TransactionListItemState extends ConsumerState<TransactionListItem> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.transaction.to == account.selectedAccount?.address
-                        ? 'Received ${widget.transaction.network}'
-                        : 'Sent ${widget.transaction.network}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      TextWidget(
+                        textKey: widget.transaction.to ==
+                                account.selectedAccount?.address
+                            ? 'received'
+                            : 'sent',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        ' ${widget.transaction.network}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
-                    '${widget.transaction.date.toString()}',
+                    widget.transaction.date.toString(),
                     style: const TextStyle(
                       fontSize: 12,
                       color: CupertinoColors.systemGrey,
@@ -79,12 +91,23 @@ class _TransactionListItemState extends ConsumerState<TransactionListItem> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  'Fee: ${widget.transaction.fee.toStringAsFixed(7)} ${widget.transaction.network}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: CupertinoColors.systemGrey,
-                  ),
+                Row(
+                  children: [
+                    const TextWidget(
+                      textKey: 'fee',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    Text(
+                      ': ${widget.transaction.fee.toStringAsFixed(7)} ${widget.transaction.network}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

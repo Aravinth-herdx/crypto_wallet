@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../core/constants/text_widget.dart';
 import '../../core/services/websocket/wallet_balance_state.dart';
 import '../../providers/accouns_provider.dart';
 
@@ -53,9 +54,11 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
 
     print(_passphraseController.text);
 
-    await ref.read(walletCreationProvider.notifier).createWallet(ref,
-      passphrase: state.isPassphraseEnabled ? _passphraseController.text : null,
-    );
+    await ref.read(walletCreationProvider.notifier).createWallet(
+          ref,
+          passphrase:
+              state.isPassphraseEnabled ? _passphraseController.text : null,
+        );
 
     if (mounted && context.mounted) {
       ref.read(walletBalanceProvider.notifier).fetchTransactions(
@@ -77,8 +80,8 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
         elevation: 0,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Text(
-            'Cancel',
+          child: const TextWidget(
+            textKey: 'cancel',
             style: TextStyle(
               color: Colors.red,
               fontSize: 17,
@@ -96,8 +99,8 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
             CupertinoButton(
               padding: const EdgeInsets.only(right: 16),
               onPressed: _handleCreate,
-              child: const Text(
-                'Create',
+              child: const TextWidget(
+                textKey: 'create',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 17,
@@ -105,8 +108,8 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
               ),
             ),
         ],
-        title: const Text(
-          'New Wallet',
+        title: const TextWidget(
+          textKey: 'new_wallet',
           style: TextStyle(
             color: Colors.black,
             fontSize: 17,
@@ -130,7 +133,7 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    state.error! + '  error',
+                    '${state.error!}  error',
                     style: TextStyle(color: Colors.red.shade700),
                   ),
                 ),
@@ -143,8 +146,8 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
                   border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: ListTile(
-                  title: const Text(
-                    'Mnemonic',
+                  title: const TextWidget(
+                    textKey: 'mnemonic',
                     style: TextStyle(
                       color: Colors.black87,
                       fontSize: 17,
@@ -154,7 +157,14 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '12 words',
+                        '12 ',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 17,
+                        ),
+                      ),
+                      TextWidget(
+                        textKey: 'words',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 17,
@@ -181,7 +191,8 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
@@ -224,75 +235,75 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
               const SizedBox(height: 16),
 
               // Passphrase Toggle
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  title: const Text(
-                    'Passphrase',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 17,
-                    ),
-                  ),
-                  trailing: CupertinoSwitch(
-                    value: state.isPassphraseEnabled,
-                    activeColor: Colors.red,
-                    onChanged: (value) {
-                      ref.read(walletCreationProvider.notifier).togglePassphrase(value);
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Passphrase Fields
-              if (state.isPassphraseEnabled) ...[
-                CupertinoTextField(
-                  controller: _passphraseController,
-                  placeholder: 'Passphrase',
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                CupertinoTextField(
-                  controller: _confirmController,
-                  placeholder: 'Confirm',
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Help Text
-              Text(
-                'Passphrases add an additional security layer to the wallets, enabling users to create multiple independent multi-coin wallets using a single mnemonic recovery phrase, but associated with different passwords.',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'To restore these wallets, a user will require a mnemonic recovery phrase as well as a password for each to be restored wallet.',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-              ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(10),
+              //     border: Border.all(color: Colors.grey.shade200),
+              //   ),
+              //   child: ListTile(
+              //     title: const Text(
+              //       'Passphrase',
+              //       style: TextStyle(
+              //         color: Colors.black87,
+              //         fontSize: 17,
+              //       ),
+              //     ),
+              //     trailing: CupertinoSwitch(
+              //       value: state.isPassphraseEnabled,
+              //       activeColor: Colors.red,
+              //       onChanged: (value) {
+              //         ref.read(walletCreationProvider.notifier).togglePassphrase(value);
+              //       },
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
+              //
+              // // Passphrase Fields
+              // if (state.isPassphraseEnabled) ...[
+              //   CupertinoTextField(
+              //     controller: _passphraseController,
+              //     placeholder: 'Passphrase',
+              //     padding: const EdgeInsets.all(16),
+              //     decoration: BoxDecoration(
+              //       color: Colors.white,
+              //       borderRadius: BorderRadius.circular(10),
+              //       border: Border.all(color: Colors.grey.shade200),
+              //     ),
+              //   ),
+              //   const SizedBox(height: 16),
+              //   CupertinoTextField(
+              //     controller: _confirmController,
+              //     placeholder: 'Confirm',
+              //     padding: const EdgeInsets.all(16),
+              //     decoration: BoxDecoration(
+              //       color: Colors.white,
+              //       borderRadius: BorderRadius.circular(10),
+              //       border: Border.all(color: Colors.grey.shade200),
+              //     ),
+              //   ),
+              //   const SizedBox(height: 16),
+              // ],
+              //
+              // // Help Text
+              // Text(
+              //   'Passphrases add an additional security layer to the wallets, enabling users to create multiple independent multi-coin wallets using a single mnemonic recovery phrase, but associated with different passwords.',
+              //   style: TextStyle(
+              //     color: Colors.grey[600],
+              //     fontSize: 14,
+              //     height: 1.5,
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
+              // Text(
+              //   'To restore these wallets, a user will require a mnemonic recovery phrase as well as a password for each to be restored wallet.',
+              //   style: TextStyle(
+              //     color: Colors.grey[600],
+              //     fontSize: 14,
+              //     height: 1.5,
+              //   ),
+              // ),
             ],
           ),
         ),

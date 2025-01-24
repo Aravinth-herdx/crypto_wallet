@@ -45,7 +45,7 @@ class TokenListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
             color: CupertinoColors.systemGrey5,
@@ -124,9 +124,9 @@ class TokenListItem extends StatelessWidget {
   Color _getChangeColor(String context) {
     // This would normally check if the change is positive or negative
     // For now, returning green for demo
-    if (context.contains('+')) {
-      return CupertinoColors.activeGreen;
+    if (context.contains('-')) {
+      return CupertinoColors.destructiveRed;
     }
-    return CupertinoColors.destructiveRed;
+    return CupertinoColors.activeGreen;
   }
 }

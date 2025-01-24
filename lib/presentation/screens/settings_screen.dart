@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/constants/text_widget.dart';
+import '../../core/localization/localization_provider.dart';
 import '../../core/theme/theme_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -12,17 +14,23 @@ class SettingsScreen extends ConsumerWidget {
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('Settings'),
+        middle: TextWidget(
+          textKey: 'settings',
+        ),
       ),
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           children: [
             CupertinoListSection(
-              header: const Text('Appearance'),
+              header: const TextWidget(
+                textKey: 'appearance',
+              ),
               children: [
                 CupertinoListTile(
-                  title: const Text('Dark Mode'),
+                  title: const TextWidget(
+                    textKey: 'dark_mode',
+                  ),
                   trailing: CupertinoSwitch(
                     value: isDarkMode,
                     activeColor: CupertinoColors.activeBlue,
@@ -33,18 +41,35 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             CupertinoListSection(
-              header: const Text('Language'),
+              header: const TextWidget(
+                textKey: 'language',
+              ),
               children: [
                 CupertinoListTile(
-                  title: const Text('Language'),
+                  title: const TextWidget(
+                    textKey: 'selected_language',
+                  ),
                   trailing: CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: (){},
-                    // onPressed: () => _showLanguagePicker(context),
-                    child: const Row(
+                    onPressed: () => _showLanguagePicker(context, ref),
+                    child: Row(
                       children: [
-                        Text('English'),
-                        SizedBox(width: 4),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            return Text(
+                              ref.watch(languageProvider) == 'en'
+                                  ? 'English'
+                                  : 'தமிழ்',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(width: 4),
                         // Icon(CupertinoIcons.chevron_forward, size: 18),
                       ],
                     ),
@@ -58,30 +83,36 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguagePicker(BuildContext context) {
+  void _showLanguagePicker(BuildContext context, WidgetRef ref) {
     showCupertinoModalPopup(
       context: context,
       builder: (_) => CupertinoActionSheet(
-        title: const Text('Choose Language'),
+        title: const TextWidget(
+          textKey: 'choose_language',
+        ),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
-              // Handle language change to English
+              setLanguage('en');
+              ref.read(languageProvider.notifier).state = 'en';
             },
             child: const Text('English'),
           ),
-          // CupertinoActionSheetAction(
-          //   onPressed: () {
-          //     Navigator.pop(context);
-          //     // Handle language change to Spanish
-          //   },
-          //   child: const Text('Spanish'),
-          // ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              setLanguage('ta');
+              ref.read(languageProvider.notifier).state = 'ta';
+            },
+            child: const Text('தமிழ்'),
+          ),
         ],
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const TextWidget(
+            textKey: 'cancel',
+          ),
         ),
       ),
     );

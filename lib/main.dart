@@ -40,7 +40,7 @@ class MyApp extends ConsumerWidget {
       theme: isDarkMode
           ? const CupertinoThemeData(brightness: Brightness.dark)
           : const CupertinoThemeData(brightness: Brightness.light),
-      home: AppRouter(),
+      home: const BiometricAuthScreen(),
       // home: WalletSetupScreen (),
     );
   }

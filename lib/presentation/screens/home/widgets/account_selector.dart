@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/text_widget.dart';
+import '../../../../core/localization/localization_provider.dart';
 import '../../../../providers/accouns_provider.dart';
 import '../../../new/wallet_creation.dart';
 import '../../../new/wallet_provider.dart';
@@ -18,7 +20,6 @@ class AccountSelector extends ConsumerStatefulWidget {
 }
 
 class _AccountSelectorState extends ConsumerState<AccountSelector> {
-
   void _showAccountMenu(BuildContext context) {
     final accountState = ref.read(accountProvider);
 
@@ -49,8 +50,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'My Accounts',
+                    const TextWidget(
+                      textKey: 'my_accounts',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -58,7 +59,9 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      child: const Text('Done'),
+                      child: const TextWidget(
+                        textKey: 'done',
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -68,7 +71,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                 child: ListView(
                   children: [
                     _buildActionButton(
-                      'Create Account',
+                      'create_account',
                       CupertinoIcons.plus_circle_fill,
                       () {
                         Navigator.pop(context);
@@ -76,7 +79,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                       },
                     ),
                     _buildActionButton(
-                      'Import Account',
+                      'import_account',
                       CupertinoIcons.arrow_down_circle_fill,
                       () {
                         Navigator.pop(context);
@@ -89,8 +92,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     ),
                     const Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'MY WALLETS',
+                      child: const TextWidget(
+                        textKey: 'my_wallets',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -172,21 +175,23 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                         ),
                       ),
                       if (account.isImported)
-                        Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: CupertinoColors.systemGrey5,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Text(
-                            'Imported',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: CupertinoColors.systemGrey,
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.systemGrey5,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const TextWidget(
+                              textKey: 'imported',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: CupertinoColors.systemGrey,
+                                  overflow: TextOverflow.ellipsis),
                             ),
                           ),
                         ),
@@ -262,8 +267,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
             color: CupertinoColors.activeBlue,
           ),
           const SizedBox(width: 12),
-          Text(
-            title,
+          TextWidget(
+            textKey: title,
             style: const TextStyle(
               color: CupertinoColors.activeBlue,
               fontSize: 16,
@@ -278,15 +283,21 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('Create New Account'),
-        content: const Text('Enter account name'),
+        title: const TextWidget(
+          textKey: 'create_new_account',
+        ),
+        // content: const Text('Enter account name'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const TextWidget(
+              textKey: 'cancel',
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
-            child: const Text('Create'),
+            child: const TextWidget(
+              textKey: 'create',
+            ),
             onPressed: () async {
               // final amount = BigInt.from(0.001 * 1e18);
               // print(amount);// Convert 0.01 ETH to wei
@@ -314,15 +325,21 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('Import Account'),
-        content: const Text('Enter private key or seed phrase'),
+        title: const TextWidget(
+          textKey: 'import_account',
+        ),
+        // content: const Text('Enter private key'),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const TextWidget(
+              textKey: 'cancel',
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
-            child: const Text('Import'),
+            child: const TextWidget(
+              textKey: 'import',
+            ),
             onPressed: () {
               // Implement account import logic
               Navigator.pop(context);
@@ -350,12 +367,12 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
       return Row(
         children: [
           _buildActionButton(
-            'Create Account',
+            'create_account',
             CupertinoIcons.plus_circle_fill,
             () => _showCreateAccountDialog(context),
           ),
           _buildActionButton(
-            'Import Account',
+            'import_account',
             CupertinoIcons.arrow_down_circle_fill,
             () => _showImportAccountDialog(context),
           ),
@@ -372,17 +389,21 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 16, bottom: 8),
-          child: Text(
-            'CURRENT ACCOUNT',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: CupertinoColors.systemGrey,
-            ),
-          ),
-        ),
+        Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 8),
+            child: Consumer(
+              builder: (context, ref, child) {
+                ref.watch(languageProvider);
+                return Text(
+                  localizedText('current_account'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                );
+              },
+            )),
         CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => _showAccountMenu(context),
