@@ -5,5 +5,5 @@ import 'send_form_notifier.dart';
 
 final sendFormProvider = StateNotifierProvider<SendFormNotifier, SendFormState>((ref) {
   WalletService webService = WalletService();
-  return SendFormNotifier(webService);
+  return SendFormNotifier(webService,ref);
 });

@@ -1,5 +1,6 @@
 import 'package:crypto_wallet/core/localization/localization_provider.dart';
 import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,11 +43,17 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
   }
 
   void _updateAddress(String value) {
-    ref.read(sendFormProvider.notifier).updateAddress(value);
+    ref.read(sendFormProvider.notifier).updateAddress(
+        value,
+        ref.watch(accountProvider).selectedAccount!.address,
+        double.parse(ref.watch(walletBalanceProvider).balance));
   }
 
   void _updateAmount(String value) {
-    ref.read(sendFormProvider.notifier).updateAmount(value);
+    ref.read(sendFormProvider.notifier).updateAmount(
+        value,
+        ref.watch(accountProvider).selectedAccount!.address,
+        double.parse(ref.watch(walletBalanceProvider).balance));
   }
 
   void _confirmTransaction() {
@@ -57,7 +64,7 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
     //   _showInvalidAddressAlert();
     //   return;
     // }
-
+    FocusScope.of(context).requestFocus(FocusNode());
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -111,13 +118,20 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
               final result = await ref
                   .read(sendFormProvider.notifier)
                   .submitTransaction(currentAcc.selectedAccount?.address ?? '');
-              print(result);
-              if (result) {
-                ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
-                    currentAcc.selectedAccount?.address ?? '');
-                ref.read(walletBalanceProvider.notifier).fetchTransactions(
-                    currentAcc.selectedAccount?.address ?? '');
-              }
+              // if (result ) {
+              //   // ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+              //   //     currentAcc.selectedAccount?.address ?? '');
+              //   // ref.read(walletBalanceProvider.notifier).fetchTransactions(
+              //   //     currentAcc.selectedAccount?.address ?? '');
+              //   ref
+              //       .read(walletBalanceProvider.notifier)
+              //       .fetchBalanceHttpBackend(
+              //           currentAcc.selectedAccount?.address ?? '');
+              //   ref
+              //       .read(walletBalanceProvider.notifier)
+              //       .fetchTransactionsBackend(
+              //           currentAcc.selectedAccount?.address ?? '');
+              // }
             },
             child: const TextWidget(
               textKey: 'confirm',
@@ -158,14 +172,19 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: TextWidget(
                 textKey: label,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600, color: Colors.black)),
           ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+          Expanded(
+            child: Text(value,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.black)),
+          ),
         ],
       ),
     );
@@ -201,7 +220,10 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
         actions: AppConstants.supportedTokens.map((token) {
           return CupertinoActionSheetAction(
             onPressed: () {
-              ref.read(sendFormProvider.notifier).updateToken(token);
+              ref.read(sendFormProvider.notifier).updateToken(
+                  token,
+                  ref.watch(accountProvider).selectedAccount!.address,
+                  double.parse(ref.watch(walletBalanceProvider).balance));
               Navigator.pop(context);
             },
             child: Text(token),
@@ -293,140 +315,149 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
     }
   }
 
-  Widget _buildTransactionDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '$label:',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Text(value),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final sendFormState = ref.watch(sendFormProvider);
     final isDarkMode = ref.watch(themeProviderNotifier);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: CupertinoTextField(
-                  maxLines: 2,
-                  controller: _addressController,
-                  placeholder: ref.watch(languageProvider) == 'en'
-                      ? 'Recipient Address'
-                      : 'பெறுநர் முகவரி',
-                  prefix: const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(CupertinoIcons.person,
-                        color: CupertinoColors.systemGrey),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  onChanged: _updateAddress,
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? null
-                        : CupertinoColors.extraLightBackgroundGray,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: _showQRScanner,
-                child: const Icon(CupertinoIcons.qrcode_viewfinder, size: 32),
-              ),
-            ],
-          ),
-          const SizedBox(height: 26),
-          Row(
-            children: [
-              Expanded(
-                child: CupertinoTextField(
-                  controller: _amountController,
-                  placeholder:
-                      ref.watch(languageProvider) == 'en' ? 'Amount' : 'தொகை',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  padding: const EdgeInsets.all(12),
-                  onChanged: _updateAmount,
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? null
-                        : CupertinoColors.extraLightBackgroundGray,
-                    borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: CupertinoTextField(
+                    maxLines: 2,
+                    controller: _addressController,
+                    placeholder: ref.watch(languageProvider) == 'en'
+                        ? 'Recipient Address'
+                        : 'பெறுநர் முகவரி',
+                    prefix: const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(CupertinoIcons.person,
+                          color: CupertinoColors.systemGrey),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    onChanged: _updateAddress,
+                    decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? null
+                            : CupertinoColors.extraLightBackgroundGray,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white
+                                : CupertinoColors.extraLightBackgroundGray)),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: _showTokenPicker,
-                child: Text(
-                  sendFormState.selectedToken,
-                  style: const TextStyle(color: CupertinoColors.activeBlue),
+                const SizedBox(width: 8),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: _showQRScanner,
+                  child: const Icon(CupertinoIcons.qrcode_viewfinder, size: 32),
+                ),
+              ],
+            ),
+            const SizedBox(height: 26),
+            Row(
+              children: [
+                Expanded(
+                  child: CupertinoTextField(
+                    controller: _amountController,
+                    placeholder:
+                        ref.watch(languageProvider) == 'en' ? 'Amount' : 'தொகை',
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    padding: const EdgeInsets.all(12),
+                    onChanged: _updateAmount,
+                    decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? null
+                            : CupertinoColors.extraLightBackgroundGray,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white
+                                : CupertinoColors.extraLightBackgroundGray)),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: _showTokenPicker,
+                  child: Text(
+                    sendFormState.selectedToken,
+                    style: const TextStyle(color: CupertinoColors.activeBlue),
+                  ),
+                ),
+              ],
+            ),
+            if (sendFormState.isFormValid)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      ref.watch(languageProvider) == 'en'
+                          ? 'Estimated Transaction Fee: '
+                          : 'மதிப்பிடப்பட்ட பரிவர்த்தனை கட்டணம்: ',
+                      style: const TextStyle(
+                        color: CupertinoColors.systemGrey,
+                        fontSize: 12,
+                      ),
+                      // textAlign: TextAlign.right,
+                    ),
+                    Text(
+                      '\$${sendFormState.transactionFee.toStringAsFixed(10)}',
+                      style: const TextStyle(
+                        color: CupertinoColors.systemGrey,
+                        fontSize: 12,
+                      ),
+                      // textAlign: TextAlign.right,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          if (sendFormState.isFormValid)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            const SizedBox(height: 15),
+            if (sendFormState.isSubmitting ||
+                ref.watch(walletBalanceProvider).isLoading)
+              const Center(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ref.watch(languageProvider) == 'en'
-                        ? 'Estimated Transaction Fee: '
-                        : 'மதிப்பிடப்பட்ட பரிவர்த்தனை கட்டணம்: ',
-                    style: const TextStyle(
-                      color: CupertinoColors.systemGrey,
-                      fontSize: 12,
-                    ),
-                    // textAlign: TextAlign.right,
+                    'Please Wait',
+                    style: TextStyle(fontSize: 16),
                   ),
-                  Text(
-                    '\$${sendFormState.transactionFee.toStringAsFixed(10)}',
-                    style: const TextStyle(
-                      color: CupertinoColors.systemGrey,
-                      fontSize: 12,
-                    ),
-                    // textAlign: TextAlign.right,
-                  ),
+                  SizedBox(width: 10),
+                  CupertinoActivityIndicator(),
                 ],
+              )),
+            if (sendFormState.isSuccess &&
+                !ref.watch(walletBalanceProvider).isLoading)
+              _buildSuccessDialog(),
+            if (sendFormState.errorMessage.isNotEmpty)
+              _buildErrorDialog(sendFormState.errorMessage),
+            if (!sendFormState.isSubmitting &&
+                !ref.watch(walletBalanceProvider).isLoading)
+              CupertinoButton.filled(
+                onPressed:
+                    sendFormState.isFormValid ? _confirmTransaction : null,
+                child: TextWidget(
+                  textKey: 'send',
+                  style: TextStyle(
+                      color: ref.watch(themeProviderNotifier)
+                          ? CupertinoColors.white
+                          : CupertinoColors.black),
+                ),
               ),
-            ),
-          const SizedBox(height: 15),
-          if (sendFormState.isSubmitting)
-            const Center(child: CupertinoActivityIndicator()),
-          if (sendFormState.isSuccess) _buildSuccessDialog(),
-          if (sendFormState.errorMessage.isNotEmpty)
-            _buildErrorDialog(sendFormState.errorMessage),
-          if (!sendFormState.isSubmitting)
-            CupertinoButton.filled(
-              onPressed: sendFormState.isFormValid ? _confirmTransaction : null,
-              child: TextWidget(
-                textKey: 'send',
-                style: TextStyle(
-                    color: ref.watch(themeProviderNotifier)
-                        ? CupertinoColors.white
-                        : CupertinoColors.black),
-              ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

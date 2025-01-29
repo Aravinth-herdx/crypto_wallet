@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/text_widget.dart';
 import '../../../../core/localization/localization_provider.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../models/network.dart';
 
 class NetworkSelector extends StatefulWidget {
@@ -85,9 +87,9 @@ class _NetworkSelectorState extends State<NetworkSelector> {
                             overflow: TextOverflow.ellipsis,
                             localizedText('select_network'),
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           );
                         },
                       ),

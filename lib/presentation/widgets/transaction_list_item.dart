@@ -4,6 +4,7 @@ import 'package:crypto_wallet/providers/accouns_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/constants/text_widget.dart';
 import '../../core/models/transaction_history.dart';
 
@@ -73,7 +74,7 @@ class _TransactionListItemState extends ConsumerState<TransactionListItem> {
                     ],
                   ),
                   Text(
-                    widget.transaction.date.toString(),
+                    AppConstants.formatDateTime(widget.transaction.date),
                     style: const TextStyle(
                       fontSize: 12,
                       color: CupertinoColors.systemGrey,

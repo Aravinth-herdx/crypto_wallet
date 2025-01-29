@@ -59,6 +59,13 @@ dependencies:
   lottie: ^3.2.0
   skeletonizer: ^1.4.3
   mobile_scanner: ^6.0.3
+  fl_chart: ^0.66.2
+  device_info_plus:
+  firebase_core:
+  firebase_messaging:
+  awesome_notifications: ^0.9.3+1
+  crypto:
+  socket_io_client:
 
 dev_dependencies:
   flutter_test:

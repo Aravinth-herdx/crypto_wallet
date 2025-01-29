@@ -61,7 +61,7 @@ class LocalizationConstants {
       'not_implemented': 'Not Implemented',
       'crypto_vault': 'Crypto Vault',
       'select_network': 'Select Network',
-      'no_history': 'No History',
+      'no_history': 'No Transaction History',
       'sent': 'Sent',
       'status': 'Status',
       'words': 'Words',
@@ -79,6 +79,7 @@ class LocalizationConstants {
       'transaction_sent': 'Transaction Sent Successfully',
       'success': 'Success',
       'select_token': 'Select Token',
+      'currencies' : 'Currencies',
     },
     'ta': {
       'auth_required': 'அங்கீகாரம் தேவை',
@@ -91,7 +92,7 @@ class LocalizationConstants {
       'home': 'வீடு',
       'history': 'வரலாறு',
       'send': 'அனுப்பு',
-      'no_history': 'வரலாறு இல்லை',
+      'no_history': 'பரிவர்த்தனை வரலாறு இல்லை',
       'settings': 'அமைப்புகள்',
       'transaction_history': 'பரிவர்த்தனை வரலாறு',
       'received': 'பெறப்பட்டது',
@@ -158,6 +159,7 @@ class LocalizationConstants {
       'transaction_sent': 'பரிவர்த்தனை வெற்றிகரமாக அனுப்பப்பட்டது',
       'success': 'வெற்றி',
       'select_token': 'டோக்கனைத் தேர்ந்தெடுக்கவும்',
+      'currencies': 'நாணயங்கள்',
     }
   };
 }
