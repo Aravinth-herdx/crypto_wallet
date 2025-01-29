@@ -210,11 +210,14 @@ class _AccountDetailsScreenState extends ConsumerState<AccountDetailsScreen> {
                   fontSize: 12,
                 ),
               ),
-              Text(
-                ': ${widget.account.address}',
-                style: const TextStyle(
-                  color: CupertinoColors.systemGrey,
-                  fontSize: 12,
+              Expanded(
+                child: Text(
+                  ': ${widget.account.address}',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: CupertinoColors.systemGrey,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],

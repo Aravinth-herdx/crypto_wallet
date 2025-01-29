@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/text_widget.dart';
 import '../../../../core/localization/localization_provider.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../../providers/accouns_provider.dart';
 import '../../../new/wallet_creation.dart';
 import '../../../new/wallet_provider.dart';
@@ -53,9 +54,9 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     const TextWidget(
                       textKey: 'my_accounts',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
@@ -92,7 +93,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                     ),
                     const Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: const TextWidget(
+                      child: TextWidget(
                         textKey: 'my_wallets',
                         style: TextStyle(
                           fontSize: 13,
@@ -105,7 +106,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                       final int idx = entry.key;
                       final AccountNew account = entry.value;
                       return _buildAccountItem(idx, account);
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
@@ -126,9 +127,14 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
       padding: EdgeInsets.zero,
       onPressed: () {
         ref.read(accountProvider.notifier).selectAccount(account);
-        ref.read(walletBalanceProvider.notifier).fetchTransactions(
+        ref.read(walletBalanceProvider.notifier).setAddress(account.address);
+        // ref.read(walletBalanceProvider.notifier).fetchTransactions(
+        //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+        // ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+        //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+        ref.read(walletBalanceProvider.notifier).fetchTransactionsBackend(
             ref.watch(accountProvider).selectedAccount?.address ?? '');
-        ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+        ref.read(walletBalanceProvider.notifier).fetchBalanceHttpBackend(
             ref.watch(accountProvider).selectedAccount?.address ?? '');
         Navigator.pop(context);
       },
@@ -204,9 +210,8 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
                       color: CupertinoColors.systemGrey,
                       fontSize: 13,
                     ),
-                    maxLines: 1, // Restrict the address to a single line
-                    overflow: TextOverflow
-                        .ellipsis, // Handle long addresses gracefully
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -308,6 +313,7 @@ class _AccountSelectorState extends ConsumerState<AccountSelector> {
               // );
               // Navigator.pop(context);
               // Implement account creation logic
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(

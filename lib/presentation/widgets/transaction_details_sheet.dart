@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/constants/text_widget.dart';
 import '../../core/models/transaction_history.dart';
 import '../screens/home/models/transaction.dart';
@@ -8,9 +9,9 @@ class TransactionDetailsSheet extends StatelessWidget {
   final Transaction transaction;
 
   const TransactionDetailsSheet({
-    Key? key,
+    super.key,
     required this.transaction,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,8 @@ class TransactionDetailsSheet extends StatelessWidget {
           _buildDetailRow('fee',
               '${transaction.fee.toStringAsFixed(7)} ${transaction.network}'),
           _buildDetailRow('status', transaction.status.toString()),
-          _buildDetailRow('date', transaction.date.toString()),
+          _buildDetailRow(
+              'date', AppConstants.formatDateTime(transaction.date)),
         ],
       ),
       actions: [

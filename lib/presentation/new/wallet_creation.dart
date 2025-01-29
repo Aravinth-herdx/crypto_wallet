@@ -61,9 +61,13 @@ class _NewWalletScreenState extends ConsumerState<NewWalletScreen> {
         );
 
     if (mounted && context.mounted) {
-      ref.read(walletBalanceProvider.notifier).fetchTransactions(
+      // ref.read(walletBalanceProvider.notifier).fetchTransactions(
+      //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+      // ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+      //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+      ref.read(walletBalanceProvider.notifier).fetchTransactionsBackend(
           ref.watch(accountProvider).selectedAccount?.address ?? '');
-      ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+      ref.read(walletBalanceProvider.notifier).fetchBalanceHttpBackend(
           ref.watch(accountProvider).selectedAccount?.address ?? '');
       Navigator.pop(context);
     }

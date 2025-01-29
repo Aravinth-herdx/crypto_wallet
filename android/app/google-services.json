@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "821886866560",
+    "project_id": "villageapp-564fe",
+    "storage_bucket": "villageapp-564fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821886866560:android:a4786b9a7b685ed12dc265",
+        "android_client_info": {
+          "package_name": "com.example.crypto_wallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7V_LO4gcqFeBU5jS1jdhGL6oXOmaJbUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

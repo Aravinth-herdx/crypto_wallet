@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto_wallet/core/constants/api_list.dart';
 import 'package:crypto_wallet/core/services/account/cccount_service_extension.dart';
 import 'package:crypto_wallet/presentation/new/wallet_creation_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +9,7 @@ import '../../core/services/account/account_service.dart';
 import '../../core/services/wallet/secure_storage_service.dart';
 import '../../core/services/wallet/wallet_service.dart';
 import '../../providers/accouns_provider.dart';
+import 'package:http/http.dart' as http;
 
 class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
   final WalletService _walletService;
@@ -18,8 +22,6 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
     state = state.copyWith(isPassphraseEnabled: value);
   }
 
-
-
   Future<void> getMnemonic({String? passphrase}) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
@@ -29,7 +31,7 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
       state = state.copyWith(
         isLoading: false,
         mnemonic: walletData,
-        mnemonicWords: walletData?.split(' '),
+        mnemonicWords: walletData.split(' '),
       );
     } catch (e) {
       state = state.copyWith(
@@ -81,6 +83,7 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
       final walletData = await _walletService.sendTransaction(
         toAddress: toAddress,
         fromAddress: fromAddress,
+        amountEth: amount.toString(),
         amount: amount,
       );
       print(walletData);

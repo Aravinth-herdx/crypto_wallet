@@ -24,7 +24,7 @@ class TokenList extends ConsumerWidget {
         ),
       ),
       child: Skeletonizer(
-        enabled: ref.watch(walletBalanceProvider).isLoading,
+        enabled: ref.watch(currencyProvider).isLoading,
         child: Column(
           children: tokens.map((token) => TokenListItem(token: token)).toList(),
         ),
@@ -33,16 +33,16 @@ class TokenList extends ConsumerWidget {
   }
 }
 
-class TokenListItem extends StatelessWidget {
+class TokenListItem extends ConsumerWidget {
   final CurrencyModel token;
 
   const TokenListItem({
-    Key? key,
+    super.key,
     required this.token,
-  }) : super(key: key);
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -71,14 +71,29 @@ class TokenListItem extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                // const SizedBox(height: 4),
-                // Text(
-                //   token.volume.toString(),
-                //   style: const TextStyle(
-                //     color: CupertinoColors.systemGrey,
-                //     fontSize: 14,
-                //   ),
-                // ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      formatMarketCap(token.marketCap),
+                      // '\$${token.marketCap}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      // _calculateChange(),
+                      '${token.priceChangePercentage.toString()}%',
+                      style: TextStyle(
+                        color: _getChangeColor(
+                            token.priceChangePercentage.toString()),
+                        fontSize: 14,
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
           ),
@@ -87,8 +102,9 @@ class TokenListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatMarketCap(token.marketCap),
-                // '\$${token.marketCap}',
+                token.currency.toUpperCase() == 'ETH'
+                    ? '\$${(ref.watch(walletBalanceProvider).ethPrice * double.parse(ref.watch(walletBalanceProvider).balance)).toStringAsFixed(2)}' // Replace 2200 with actual rate
+                    : '\$0.00',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -96,11 +112,11 @@ class TokenListItem extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                // _calculateChange(),
-                '${token.priceChangePercentage.toString()}%',
-                style: TextStyle(
-                  color:
-                      _getChangeColor(token.priceChangePercentage.toString()),
+                token.currency.toUpperCase() == 'ETH'
+                    ? ref.watch(walletBalanceProvider).balance.toString()
+                    : '0.0',
+                style: const TextStyle(
+                  color: Colors.grey,
                   fontSize: 14,
                 ),
               ),

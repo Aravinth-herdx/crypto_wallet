@@ -74,6 +74,7 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
 
   void _importWallet() async {
     final mnemonic = _mnemonicController.text.trim();
+    FocusScope.of(context).requestFocus(FocusNode());
     final result = await ref
         .read(walletImportProvider.notifier)
         .importWallet(mnemonic.trim(), ref);
@@ -108,9 +109,13 @@ class _WalletImportScreenState extends ConsumerState<WalletImportScreen> {
   void _handleSuccess() {
     _mnemonicController.clear();
     Future.delayed(const Duration(seconds: 1), () {
-      ref.read(walletBalanceProvider.notifier).fetchTransactions(
+      // ref.read(walletBalanceProvider.notifier).fetchTransactions(
+      //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+      // ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+      //     ref.watch(accountProvider).selectedAccount?.address ?? '');
+      ref.read(walletBalanceProvider.notifier).fetchTransactionsBackend(
           ref.watch(accountProvider).selectedAccount?.address ?? '');
-      ref.read(walletBalanceProvider.notifier).fetchBalanceHttp(
+      ref.read(walletBalanceProvider.notifier).fetchBalanceHttpBackend(
           ref.watch(accountProvider).selectedAccount?.address ?? '');
       Navigator.pop(context);
     });

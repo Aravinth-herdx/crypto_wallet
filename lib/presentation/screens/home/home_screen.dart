@@ -1,4 +1,5 @@
 import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
+import 'package:crypto_wallet/presentation/screens/home/models/currency_model.dart';
 import 'package:crypto_wallet/presentation/screens/home/widgets/account_selector.dart';
 import 'package:crypto_wallet/presentation/screens/home/widgets/network_selector.dart';
 import 'package:flutter/cupertino.dart';
@@ -85,7 +86,7 @@ class HomeScreenNew extends ConsumerWidget {
               totalBalance: ref.watch(walletBalanceProvider).balance.toString(),
             ),
             const SizedBox(height: 20),
-            if (ref.watch(walletBalanceProvider).isLoading) ...[
+            if (ref.watch(currencyProvider).isLoading) ...[
               const SizedBox(
                 height: 80,
                 width: 20,

@@ -11,6 +11,7 @@ class WalletBalanceState {
   final String balance;
   final List<Transaction> transaction;
   final List<CurrencyModel> currency;
+  final double ethPrice;
 
   WalletBalanceState({
     required this.network,
@@ -20,6 +21,7 @@ class WalletBalanceState {
     this.balance = '0.0',
     this.transaction = const [],
     this.currency = const [],
+    this.ethPrice = 0.0,
   });
 
   WalletBalanceState copyWith({
@@ -30,6 +32,7 @@ class WalletBalanceState {
     String? balance,
     List<Transaction>? transaction,
     List<CurrencyModel>? currency,
+    double? ethPrice,
   }) {
     return WalletBalanceState(
       network: network ?? this.network,
@@ -39,6 +42,7 @@ class WalletBalanceState {
       balance: balance ?? this.balance,
       transaction: transaction ?? this.transaction,
       currency: currency ?? this.currency,
+      ethPrice: ethPrice ?? this.ethPrice,
     );
   }
 }

