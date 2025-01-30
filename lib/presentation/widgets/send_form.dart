@@ -1,10 +1,8 @@
 import 'package:crypto_wallet/core/localization/localization_provider.dart';
 import 'package:crypto_wallet/core/services/websocket/wallet_balance_state.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/text_widget.dart';
@@ -22,7 +20,6 @@ class EnhancedSendForm extends ConsumerStatefulWidget {
 class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
   late TextEditingController _addressController;
   late TextEditingController _amountController;
-  final MobileScannerController _scannerController = MobileScannerController();
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
@@ -38,7 +35,6 @@ class _EnhancedSendFormState extends ConsumerState<EnhancedSendForm> {
   void dispose() {
     _addressController.dispose();
     _amountController.dispose();
-    _scannerController.dispose();
     super.dispose();
   }
 

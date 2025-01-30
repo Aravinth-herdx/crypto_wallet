@@ -44,9 +44,9 @@ dependencies:
   shared_preferences: ^2.3.5
   flutter_secure_storage: ^9.2.4
   bip39: ^1.0.6
-  flutter_local_notifications: ^18.0.1
+#  flutter_local_notifications: ^18.0.1
   web_socket_channel: ^3.0.1
-  flutter_bloc: ^9.0.0
+#  flutter_bloc: ^9.0.0
   flutter_riverpod: ^2.6.1
   ed25519_hd_key: ^2.3.0
   hex: ^0.2.0
@@ -58,9 +58,9 @@ dependencies:
   hdkey: ^0.0.1
   lottie: ^3.2.0
   skeletonizer: ^1.4.3
-  mobile_scanner: ^6.0.3
+#  mobile_scanner: ^6.0.3
   fl_chart: ^0.66.2
-  device_info_plus:
+#  device_info_plus:
   firebase_core:
   firebase_messaging:
   awesome_notifications: ^0.9.3+1

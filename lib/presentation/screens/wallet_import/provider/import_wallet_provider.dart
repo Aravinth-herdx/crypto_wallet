@@ -4,6 +4,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:hex/hex.dart';
 
 import '../../../../core/services/wallet/wallet_service.dart';
+import '../../../../core/services/websocket/wallet_balance_state.dart';
 import '../../../../providers/accouns_provider.dart';
 import '../../../new/wallet_provider.dart';
 
@@ -41,7 +42,8 @@ class WalletImportNotifier extends StateNotifier<WalletImportState> {
         throw Exception('Invalid private key format');
       }
 
-      privateKey = privateKey.startsWith('0x') ? privateKey.substring(2) : privateKey;
+      privateKey =
+          privateKey.startsWith('0x') ? privateKey.substring(2) : privateKey;
 
       final result = await _walletService.importWalletAddress(
         privateKey: privateKey,
@@ -50,6 +52,9 @@ class WalletImportNotifier extends StateNotifier<WalletImportState> {
       await ref.read(accountProvider.notifier).addWalletAccount(
           result['address']!, result['privateKey']!,
           isImported: true);
+      ref
+          .read(walletBalanceProvider.notifier)
+          .setAddress(result['address'] ?? '');
 
       state = state.copyWith(isLoading: false);
       return true;
@@ -58,7 +63,6 @@ class WalletImportNotifier extends StateNotifier<WalletImportState> {
       return false;
     }
   }
-
 
   bool _validatePrivateKey(String privateKey) {
     try {

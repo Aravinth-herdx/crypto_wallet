@@ -31,6 +31,7 @@ class AppNotification {
 
   static void setupForegroundNotificationListener() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print(message.notification?.toMap());
       final data = message.data;
       final image = message.notification?.android?.imageUrl;
       if (message.notification != null) {
@@ -46,8 +47,7 @@ class AppNotification {
             body: message.notification?.body ?? '',
             backgroundColor: Colors.white,
             payload: payload,
-            bigPicture:
-                image ?? 'https://files.coinswitch.co/public/coins/eth.png',
+            bigPicture: image,
             notificationLayout: image != null
                 ? NotificationLayout.BigPicture
                 : NotificationLayout.Default,

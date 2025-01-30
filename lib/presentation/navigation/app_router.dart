@@ -60,7 +60,7 @@ class _AppRouterState extends ConsumerState<AppRouter>
 
   Future<void> connectWebSocket() async {
     await Future.delayed(Duration.zero);
-    final account = ref.read(accountProvider).selectedAccount?.address;
+    // final account = ref.read(accountProvider).selectedAccount?.address;
     // if (account != null) {
     // ref.read(walletBalanceProvider.notifier).reconnect(account);
     ref.read(walletBalanceProvider.notifier).ioConnect();
