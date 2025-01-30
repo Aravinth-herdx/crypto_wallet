@@ -1,7 +1,7 @@
 class ApiList {
-  static const String dev = "http://192.168.217.182:2001/api";
-  static const String wsUrl = "ws://192.168.29.65:2001";
-  static const String ioUrl = "ws://192.168.217.182:2001";
+  static const String dev = "http://122.165.18.7:2001/api";
+  static const String wsUrl = "ws://122.165.18.7:2001";
+  static const String ioUrl = "ws://122.165.18.7:2001";
 
   static const String current = dev;
 

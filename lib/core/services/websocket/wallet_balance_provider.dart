@@ -90,7 +90,6 @@ class WalletBalanceProvider extends StateNotifier<WalletBalanceState> {
     print("Received: $message");
     try {
       final result = message is String ? jsonDecode(message) : message;
-
       if (result is Map<String, dynamic> &&
           state.address == result['transaction']['to']) {
         state = state.copyWith(transaction: [

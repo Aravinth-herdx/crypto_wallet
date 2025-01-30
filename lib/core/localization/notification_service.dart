@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -96,36 +91,36 @@ class NotificationService {
   //   }
   // }
 
-  Future<String?> generateExpoPushToken(BuildContext context) async {
-    try {
-      // Get device info
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      String deviceId = '';
-
-      if (Theme.of(context).platform == TargetPlatform.android) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceId = androidInfo.id;
-      } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceId = iosInfo.identifierForVendor!;
-      }
-
-      // Generate a unique identifier
-      final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final input = '$deviceId-$timestamp';
-
-      // Create SHA-256 hash
-      final bytes = utf8.encode(input);
-      final hash = sha256.convert(bytes);
-
-      // Format the token
-      print('ExponentPushToken[${hash.toString()}]');
-      return 'ExponentPushToken[${hash.toString().substring(0, 20)}]';
-    } catch (e) {
-      print('Error generating Expo push token: $e');
-      return null;
-    }
-  }
+  // Future<String?> generateExpoPushToken(BuildContext context) async {
+  //   try {
+  //     // Get device info
+  //     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //     String deviceId = '';
+  //
+  //     if (Theme.of(context).platform == TargetPlatform.android) {
+  //       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  //       deviceId = androidInfo.id;
+  //     } else if (Theme.of(context).platform == TargetPlatform.iOS) {
+  //       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+  //       deviceId = iosInfo.identifierForVendor!;
+  //     }
+  //
+  //     // Generate a unique identifier
+  //     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  //     final input = '$deviceId-$timestamp';
+  //
+  //     // Create SHA-256 hash
+  //     final bytes = utf8.encode(input);
+  //     final hash = sha256.convert(bytes);
+  //
+  //     // Format the token
+  //     print('ExponentPushToken[${hash.toString()}]');
+  //     return 'ExponentPushToken[${hash.toString().substring(0, 20)}]';
+  //   } catch (e) {
+  //     print('Error generating Expo push token: $e');
+  //     return null;
+  //   }
+  // }
 
   static const MethodChannel _platform = MethodChannel('com.example.device_token');
 

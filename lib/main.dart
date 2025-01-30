@@ -26,11 +26,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   requestNotificationPermission();
-  await SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await AppNotification.initializeNotification();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // NotificationService.getDeviceToken();
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(
     const ProviderScope(child: MyApp()),
   );

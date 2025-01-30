@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/account/account_service.dart';
 import '../../core/services/wallet/secure_storage_service.dart';
 import '../../core/services/wallet/wallet_service.dart';
+import '../../core/services/websocket/wallet_balance_state.dart';
 import '../../providers/accouns_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -56,6 +57,9 @@ class WalletCreationNotifier extends StateNotifier<WalletCreationState> {
       await ref
           .read(accountProvider.notifier)
           .addWalletAccount(walletData['address']!, walletData['privateKey']!);
+      ref
+          .read(walletBalanceProvider.notifier)
+          .setAddress(walletData['address'] ?? '');
       print('account added created');
       print(walletData['address']);
       print(walletData['mnemonic']?.split(' '));
